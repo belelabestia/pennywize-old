@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-transactions',
@@ -7,26 +8,11 @@ import { Transaction } from 'src/app/models/transaction';
   styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
-  transactions: Transaction[] = [
-    {
-      id: '6kklkjkough0gyuv',
-      amount: '50',
-      type: 'svago',
-      date: new Date(),
-      description: 'puttaneeee'
-    },
-    {
-      id: 'rd7ufoeg0cbrye59ty',
-      amount: '1000',
-      type: 'svago',
-      date: new Date(),
-      description: 'casinò'
-    }
-  ];
+  transactions: Transaction[];
 
-  constructor() { }
+  constructor(private hc: HttpClient) {}
 
   ngOnInit() {
+    this.hc.get<Transaction[]>('api/transactions').subscribe(t => this.transactions = t);
   }
-
 }

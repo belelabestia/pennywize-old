@@ -1,3 +1,4 @@
 <p>transactions works!</p>
 
+<p *ngIf="!transactions">Loading...</p>
 <app-transaction *ngFor="let t of transactions" [transaction]="t"></app-transaction>
