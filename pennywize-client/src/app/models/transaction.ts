@@ -1,6 +1,6 @@
 export class Transaction {
     id: string;
-    date: string;
+    date: Date;
     amount: string;
     type: string;
     description: string;
