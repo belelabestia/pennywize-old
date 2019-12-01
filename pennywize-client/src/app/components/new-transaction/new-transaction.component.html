@@ -1,7 +1,7 @@
 <p>new-transaction works!</p>
 
-<input type="text" [(ngModel)]="transaction.date" placeholder="date">
-<input type="text" [(ngModel)]="transaction.amount" placeholder="amount">
+<input type="datetime-local" [(ngModel)]="transaction.date" placeholder="date">
+<input type="number" [(ngModel)]="transaction.amount" placeholder="amount">
 <input type="text" [(ngModel)]="transaction.type" placeholder="type">
 <input type="text" [(ngModel)]="transaction.description" placeholder="description">
 <button (click)="save()">Save</button>
