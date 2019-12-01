@@ -4,4 +4,4 @@
 <input type="number" [(ngModel)]="transaction.amount" placeholder="amount">
 <input type="text" [(ngModel)]="transaction.type" placeholder="type">
 <input type="text" [(ngModel)]="transaction.description" placeholder="description">
-<button (click)="save()">Save</button>
+<button (click)="save()" [disabled]="posting">Save</button>

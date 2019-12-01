@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
-import { HttpClient } from '@angular/common/http';
+import { TransactionService } from 'src/app/services/transaction.service';
 
 @Component({
   selector: 'app-transactions',
@@ -10,9 +10,10 @@ import { HttpClient } from '@angular/common/http';
 export class TransactionsComponent implements OnInit {
   transactions: Transaction[];
 
-  constructor(private hc: HttpClient) {}
+  constructor(private t: TransactionService) {}
 
   ngOnInit() {
-    this.hc.get<Transaction[]>('api/transactions').subscribe(t => this.transactions = t);
+    this.t.transactions.subscribe(tt => this.transactions = tt);
+    this.t.get();
   }
 }
