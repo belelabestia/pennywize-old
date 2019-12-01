@@ -23,32 +23,7 @@ namespace PennywizeServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
         {
-            // return await _context.Transaction.ToListAsync();
-            return new List<Transaction>
-            {
-                new Transaction
-                {
-                    Id = "hfsduohfcunct",
-                    Date = DateTime.Now,
-                    Amount = 20,
-                    Type = "svago",
-                    Description = "buttane"
-                },
-                new Transaction {
-                    Id = "gfdskt0utve4cf2r",
-                    Date = DateTime.Now,
-                    Amount = 50,
-                    Type = "svago",
-                    Description = "bocchini"
-                },
-                new Transaction {
-                    Id = "4uf3u60934u609f54",
-                    Date = DateTime.Now,
-                    Amount = 29040,
-                    Type = "svago",
-                    Description = "poker"
-                },
-            };
+            return await _context.Transaction.ToListAsync();
         }
 
         // GET: api/Transactions/5
