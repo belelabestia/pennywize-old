@@ -3,117 +3,96 @@ using Microsoft.EntityFrameworkCore;
 using PennywizeServer.Models;
 using PennywizeServer.Controllers;
 using Xunit;
-using System.Threading.Tasks;
 using System.Linq;
-using Xunit.Abstractions;
 using System.Collections.Generic;
 
 namespace PennywizeServer.Test
 {
-    public class TransactionTest : IClassFixture<PennywizeFixture>
+    public class TransactionTest
     {
-        DbContextOptions<PennywizeContext> options = new DbContextOptionsBuilder<PennywizeContext>().UseInMemoryDatabase("pnwz").Options;
+        DbContextOptions<PennywizeContext> options;
+
+        public TransactionTest() => SetUpContext();
 
         [Fact]
-        public async Task GetTransactions_ShouldReturnAll()
+        public void GetTransactions_ShouldReturnAll()
         {
-            IEnumerable<Transaction> transactions0 = new Transaction[0];
+            var transactions0 = default(IEnumerable<Transaction>);
+            var transactions1 = default(IEnumerable<Transaction>);
 
-            await Using(async (context, controller) =>
-            {
-                transactions0 = (await controller.GetTransaction()).Value;
-            });
+            UsingController(controller => transactions0 = controller.GetTransactions().Result.Value);
+            UsingContext(context => transactions1 = context.Transactions.ToArray());
 
-            Using((context, controller) =>
-            {
-                var transactions1 = context.Transaction;
-
-                Assert.True(transactions1.Count() == 4);
-
-                Assert.All(transactions0.Zip(transactions1), tt => Assert.True(tt.First.Description == tt.Second.Description));
-
-                Assert.Collection(transactions1.Select(t => t.Amount), new Action<double>[]
-                {
-                    a => Assert.True(a == -50),
-                    a => Assert.True(a == -500),
-                    a => Assert.True(a == -15),
-                    a => Assert.True(a == 1500)
-                });
-            });
+            Assert.True(transactions1.Count() == 4);
+            Assert.All(transactions0.Zip(transactions1), tt => Assert.True(
+                tt.First.Description == tt.Second.Description &&
+                tt.First.Amount == tt.Second.Amount
+            ));
         }
 
         [Fact]
-        public async Task GetTranslation_ShouldReturnById()
+        public void GetTranslation_ShouldReturnById()
         {
-            var transaction0 = new Transaction();
+            var transaction0 = default(Transaction);
+            var transaction1 = default(Transaction);
 
-            Using((context, controller) =>
-            {
-                transaction0 = context.Transaction.First();
-            });
+            UsingContext(context => transaction0 = context.Transactions.First());
+            UsingController(controller => transaction1 = controller.GetTransaction(transaction0.Id).Result.Value);
 
-            await Using(async (context, controller) =>
-            {
-                var transaction1 = (await controller.GetTransaction(transaction0.Id)).Value;
-
-                Assert.True(
-                    transaction1.Amount == transaction0.Amount &&
-                    transaction1.Date == transaction0.Date &&
-                    transaction1.Type == transaction0.Type &&
-                    transaction1.Description == transaction0.Description
-                );
-            });
+            Assert.True(
+                transaction1.Amount == transaction0.Amount &&
+                transaction1.Date == transaction0.Date &&
+                transaction1.Type == transaction0.Type &&
+                transaction1.Description == transaction0.Description
+            );
         }
 
         [Fact]
-        public async Task PostTransaction_ShouldInsertElement()
+        public void PostTransaction_ShouldInsertElement()
         {
-            await Using(async (context, controller) =>
-            {
-                await controller.PostTransaction(TestTransaction());
-            });
+            var transactions = default(IEnumerable<Transaction>);
+            var transaction = TestTransaction();
 
-            await Using(async (context, controller) => await Task.Run(() =>
-            {
-                var transactions = context.Transaction;
-                var test = TestTransaction();
+            UsingController(controller => controller.PostTransaction(transaction).Wait());
+            UsingContext(context => transactions = context.Transactions.ToArray());
 
-                Assert.True(
-                    transactions.Count() == 5 &&
-                    transactions.Any(t => 
-                        t.Description == test.Description &&
-                        t.Amount == test.Amount
-                    )
-                );
-            }));
+            Assert.True(
+                transactions.Count() == 5 &&
+                transactions.Any(t =>
+                    t.Description == transaction.Description &&
+                    t.Amount == transaction.Amount
+                )
+            );
         }
 
         [Fact]
-        public async Task PutTransaction_ShouldUpdateElement()
+        public void PutTransaction_ShouldUpdateElement()
         {
-            var transaction0 = new Transaction();
-            var suffix = " - Changed";
+            var transaction0 = TestTransaction();
+            var transaction1 = default(Transaction);
 
-            await Using(async (context, controller) =>
-            {
-                transaction0 = context.Transaction.First();
+            UsingContext(context => transaction0.Id = context.Transactions.First().Id);
+            UsingController(controller => controller.PutTransaction(transaction0.Id, transaction0).Wait());
+            UsingContext(context => transaction1 = context.Transactions.Find(transaction0.Id));
 
-                transaction0.Amount += 10;
-                transaction0.Description += suffix;
+            Assert.True(
+                transaction1.Amount == transaction0.Amount &&
+                transaction1.Type == transaction0.Type &&
+                transaction1.Description == transaction0.Description
+            );
+        }
 
-                await controller.PutTransaction(transaction0.Id, transaction0);
-            });
+        [Fact]
+        public void DeleteTransaction_ShouldRemoveElement()
+        {
+            var transaction0 = default(Transaction);
+            var transaction1 = default(Transaction);
 
-            await Using(async (context, controller) =>
-            {
-                var transaction1 = await context.Transaction.FindAsync(transaction0.Id);
+            UsingContext(context => transaction0 = context.Transactions.First());
+            UsingController(controller => controller.DeleteTransaction(transaction0.Id).Wait());
+            UsingContext(context => transaction1 = context.Transactions.Find(transaction0.Id));
 
-                Assert.True(
-                    transaction1.Id == transaction0.Id &&
-                    transaction1.Amount == transaction0.Amount &&
-                    transaction1.Description == transaction0.Description
-                );
-            });
+            Assert.Null(transaction1);
         }
 
         private Transaction TestTransaction() => new Transaction
@@ -124,22 +103,61 @@ namespace PennywizeServer.Test
             Description = "tua mamma"
         };
 
-        private async Task Using(Func<PennywizeContext, TransactionsController, Task> action)
+        private void UsingContext(Action<PennywizeContext> action)
         {
             using (var context = new PennywizeContext(options))
             {
-                var controller = new TransactionsController(context);
-                await action(context, controller);
+                action(context);
             }
         }
 
-        private void Using(Action<PennywizeContext, TransactionsController> action)
+        private void UsingController(Action<TransactionsController> action) =>
+            UsingContext(context => action(new TransactionsController(context)));
+
+        private void SetUpContext()
         {
-            using (var context = new PennywizeContext(options))
+            options = new DbContextOptionsBuilder<PennywizeContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            UsingContext(context =>
             {
-                var controller = new TransactionsController(context);
-                action(context, controller);
-            }
+                context.Database.EnsureDeleted();
+
+                context.Transactions.Add(new Transaction
+                {
+                    Amount = -50,
+                    Date = DateTime.Now,
+                    Type = "svago",
+                    Description = "giochi per bambini"
+                });
+
+                context.Transactions.Add(new Transaction
+                {
+                    Amount = -500,
+                    Date = DateTime.Now,
+                    Type = "svago",
+                    Description = "giochi per adulti"
+                });
+
+                context.Transactions.Add(new Transaction
+                {
+                    Amount = -15,
+                    Date = DateTime.Now,
+                    Type = "abbonamenti",
+                    Description = "spotify"
+                });
+
+                context.Transactions.Add(new Transaction
+                {
+                    Amount = 1500,
+                    Date = DateTime.Now,
+                    Type = "stipendio",
+                    Description = "agosto"
+                });
+
+                context.SaveChanges();
+            });
         }
     }
 }
