@@ -23,6 +23,6 @@ namespace PennywizeServer.Models
 
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
-        public DbSet<Transaction> Transaction { get; set; }
+        public DbSet<Transaction> Transactions { get; set; }
     }
 }

@@ -21,16 +21,16 @@ namespace PennywizeServer.Controllers
 
         // GET: api/Transactions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransaction()
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            return await _context.Transaction.ToListAsync();
+            return await _context.Transactions.ToListAsync();
         }
 
         // GET: api/Transactions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(string id)
         {
-            var transaction = await _context.Transaction.FindAsync(id);
+            var transaction = await _context.Transactions.FindAsync(id);
 
             if (transaction == null)
             {
@@ -78,7 +78,7 @@ namespace PennywizeServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
-            _context.Transaction.Add(transaction);
+            _context.Transactions.Add(transaction);
             try
             {
                 await _context.SaveChangesAsync();
@@ -102,13 +102,13 @@ namespace PennywizeServer.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Transaction>> DeleteTransaction(string id)
         {
-            var transaction = await _context.Transaction.FindAsync(id);
+            var transaction = await _context.Transactions.FindAsync(id);
             if (transaction == null)
             {
                 return NotFound();
             }
 
-            _context.Transaction.Remove(transaction);
+            _context.Transactions.Remove(transaction);
             await _context.SaveChangesAsync();
 
             return transaction;
@@ -116,7 +116,7 @@ namespace PennywizeServer.Controllers
 
         private bool TransactionExists(string id)
         {
-            return _context.Transaction.Any(e => e.Id == id);
+            return _context.Transactions.Any(e => e.Id == id);
         }
     }
 }
