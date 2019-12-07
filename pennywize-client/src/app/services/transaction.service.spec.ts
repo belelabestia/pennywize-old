@@ -81,7 +81,7 @@ describe('TransactionService', () => {
     req0.flush(transaction);
 
     const req1 = httpTestingController.expectOne('api/transactions');
-    expect(req0.request.method).toBe('POST');
+    expect(req1.request.method).toBe('GET');
     req1.flush([transaction]);
   });
 });
