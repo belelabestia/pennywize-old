@@ -9,8 +9,8 @@ using PennywizeServer.Models;
 namespace PennywizeServer.Migrations
 {
     [DbContext(typeof(PennywizeContext))]
-    [Migration("20191201211604_AddTransaction")]
-    partial class AddTransaction
+    [Migration("20191207235308_Transactions")]
+    partial class Transactions
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,6 +21,7 @@ namespace PennywizeServer.Migrations
             modelBuilder.Entity("PennywizeServer.Transaction", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Amount")
@@ -37,7 +38,7 @@ namespace PennywizeServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("Transactions");
                 });
 #pragma warning restore 612, 618
         }

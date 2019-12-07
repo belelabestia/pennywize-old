@@ -19,6 +19,7 @@ namespace PennywizeServer.Migrations
             modelBuilder.Entity("PennywizeServer.Transaction", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Amount")
@@ -35,7 +36,7 @@ namespace PennywizeServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("Transactions");
                 });
 #pragma warning restore 612, 618
         }
