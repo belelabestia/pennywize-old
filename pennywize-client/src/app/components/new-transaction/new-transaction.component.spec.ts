@@ -46,8 +46,6 @@ describe('NewTransactionComponent', () => {
     type.value = 'fj0j';
     description.value = 'hd40rvefss';
 
-    fixture.detectChanges();
-
     [date, amount, type, description].forEach(i => i.dispatchEvent(new Event('input')));
 
     const t = component.transaction;
