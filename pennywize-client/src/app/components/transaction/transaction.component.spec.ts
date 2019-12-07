@@ -29,10 +29,12 @@ describe('TransactionComponent', () => {
   });
 
   it('sould display transaction properties', () => {
+    const date = new Date(98769876);
+
     component.transaction = new Transaction({
       id: 'o4gh80ghw408h',
       amount: 348,
-      date: new Date(9998340),
+      date,
       type: 'fgiopeh',
       description: '048ewh0vihcr0'
     });
@@ -43,6 +45,7 @@ describe('TransactionComponent', () => {
 
     expect(text).toContain('id: o4gh80ghw408h');
     expect(text).toContain('amount: 348');
+    expect(text).toContain(`date: ${date}`);
     expect(text).toContain('type: fgiopeh');
     expect(text).toContain('description: 048ewh0vihcr0');
   });
