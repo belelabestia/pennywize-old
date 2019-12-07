@@ -1,6 +1,6 @@
 <p>new-transaction works!</p>
 
-<input type="datetime-local" [(ngModel)]="transaction.date" placeholder="date">
+<input type="date" [ngModel]="transaction.date | date: 'yyyy-MM-dd'" (ngModelChange)="dateChange($event)" placeholder="date">
 <input type="number" [(ngModel)]="transaction.amount" placeholder="amount">
 <input type="text" [(ngModel)]="transaction.type" placeholder="type">
 <input type="text" [(ngModel)]="transaction.description" placeholder="description">

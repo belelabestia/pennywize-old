@@ -15,7 +15,11 @@ export class NewTransactionComponent {
 
   save() {
     this.posting = true;
-    this.t.post(this.transaction).then(() => this.posting = false);
     this.transaction = new Transaction();
+    return this.t.post(this.transaction).then(() => this.posting = false);
+  }
+
+  dateChange(date: string) {
+    this.transaction.date = new Date(date);
   }
 }
