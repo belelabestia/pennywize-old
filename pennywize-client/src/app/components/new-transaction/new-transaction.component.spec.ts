@@ -58,7 +58,7 @@ describe('NewTransactionComponent', () => {
     ).toBeTruthy();
   });
 
-  it('should save new transaction', () => {
+  it('should save new transaction', async () => {
     component.transaction = new Transaction({
       date: new Date(),
       amount: 5654,
@@ -66,24 +66,41 @@ describe('NewTransactionComponent', () => {
       description: '0fer9hgr0e9h'
     });
 
-    expect(component.posting).toBeFalsy();
+    expect(component.posting).toBe(false);
 
-    component.save().then(() => {
-      expect(component.posting).toBeFalsy();
-    });
+    const promise = component.save();
 
-    expect(component.posting).toBeTruthy();
+    expect(component.posting).toBe(true);
 
     const post = controller.expectOne('api/transactions');
-    expect(post.request.method).toBe('POST');
     post.flush(component.transaction);
 
     const get = controller.expectOne('api/transactions');
-    expect(get.request.method).toBe('GET');
     get.flush([component.transaction]);
 
     Object.keys(component.transaction).forEach(
       k => expect(component.transaction[k]).toBeFalsy()
     );
+
+    await promise;
+
+    expect(component.posting).toBe(false);
+  });
+
+  it('should handle error on saving', async () => {
+    component.transaction = new Transaction({
+      date: new Date(),
+      amount: 5654,
+      type: 'cjsohfvs',
+      description: '0fer9hgr0e9h'
+    });
+
+    const promise = component.save();
+
+    const post = controller.expectOne('api/transactions');
+    post.error(new ErrorEvent('test error'));
+
+    await promise;
+    expect(component.posting).toBe(false);
   });
 });
