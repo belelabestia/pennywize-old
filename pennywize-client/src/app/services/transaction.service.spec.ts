@@ -25,7 +25,7 @@ describe('TransactionService', () => {
     expect(transactionService).toBeTruthy();
   });
 
-  it('should get transactions', () => {
+  it('should get transactions', async () => {
     const transactions: Transaction[] = [
       new Transaction({
         id: 'gubh78yb79bt',
@@ -54,14 +54,16 @@ describe('TransactionService', () => {
       tt => expect(tt).toEqual(transactions)
     );
 
-    transactionService.get();
+    const promise = transactionService.get();
 
     const req = httpTestingController.expectOne('api/transactions');
     expect(req.request.method).toBe('GET');
     req.flush(transactions);
+
+    await promise;
   });
 
-  it('should post a transaction', () => {
+  it('should post a transaction', async () => {
     const transaction = new Transaction({
       id: 'fhtc5ueyc89ny',
       amount: 843,
@@ -74,7 +76,7 @@ describe('TransactionService', () => {
       expect(tt).toContain(transaction)
     );
 
-    transactionService.post(transaction);
+    const promise = transactionService.post(transaction);
 
     const req0 = httpTestingController.expectOne('api/transactions');
     expect(req0.request.method).toBe('POST');
@@ -83,5 +85,24 @@ describe('TransactionService', () => {
     const req1 = httpTestingController.expectOne('api/transactions');
     expect(req1.request.method).toBe('GET');
     req1.flush([transaction]);
+
+    await promise;
+  });
+
+  it('should handle an http error on get', async () => {
+    const promise = transactionService.get();
+
+    const req = httpTestingController.expectOne('api/transactions');
+    req.error(new ErrorEvent('test error'));
+
+    await expectAsync(promise).toBeRejected();
+  });
+
+  it('should handle an http error on post', async () => {
+    const promise = transactionService.post(new Transaction());
+    const req = httpTestingController.expectOne('api/transactions');
+    req.error(new ErrorEvent('test error'));
+
+    await expectAsync(promise).toBeRejected();
   });
 });
