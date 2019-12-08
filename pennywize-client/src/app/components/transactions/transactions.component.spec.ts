@@ -4,12 +4,13 @@ import { TransactionsComponent } from './transactions.component';
 import { TransactionComponent } from '../transaction/transaction.component';
 import { NewTransactionComponent } from '../new-transaction/new-transaction.component';
 import { FormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
+  let controller: HttpTestingController;
   let element: HTMLElement;
 
   beforeEach(async(() => {
@@ -24,13 +25,14 @@ describe('TransactionsComponent', () => {
         HttpClientTestingModule
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TransactionsComponent);
     component = fixture.componentInstance;
     element = fixture.nativeElement;
+    controller = TestBed.get(HttpTestingController);
     fixture.detectChanges();
   });
 
@@ -38,7 +40,7 @@ describe('TransactionsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should contain new transaction', () =>  {
+  it('should contain new transaction', () => {
     const newTran = element.querySelector('app-new-transaction');
     expect(newTran).toBeTruthy();
   });
@@ -48,8 +50,10 @@ describe('TransactionsComponent', () => {
     expect(pp.some(p => p.innerText.includes('Loading...'))).toBeTruthy();
   });
 
-  it('sould show transactions', () => {
-    component.transactions = [
+  it('should show transactions', async () => {
+    const req = controller.expectOne('api/transactions');
+
+    req.flush([
       new Transaction({
         id: 'hfrhe08rhg09',
         amount: 340,
@@ -64,11 +68,21 @@ describe('TransactionsComponent', () => {
         date: new Date(),
         description: 'y8y98h80h80h'
       })
-    ];
+    ]);
 
+    await fixture.whenStable();
     fixture.detectChanges();
 
     const transactions = element.querySelectorAll('app-transaction');
     expect(transactions.length).toBe(2);
+  });
+
+  it('should handle fetch error', async () => {
+    const req = controller.expectOne('api/transactions');
+    req.error(new ErrorEvent('test error'));
+
+    await fixture.whenStable();
+    expect(component.error).toBe(true);
+    expect(component.loading).toBe(false);
   });
 });

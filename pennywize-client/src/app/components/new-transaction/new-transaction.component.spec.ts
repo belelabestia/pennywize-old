@@ -78,22 +78,24 @@ describe('NewTransactionComponent', () => {
     const get = controller.expectOne('api/transactions');
     get.flush([component.transaction]);
 
+    await promise;
+
     Object.keys(component.transaction).forEach(
       k => expect(component.transaction[k]).toBeFalsy()
     );
-
-    await promise;
 
     expect(component.posting).toBe(false);
   });
 
   it('should handle error on saving', async () => {
-    component.transaction = new Transaction({
+    const transaction = new Transaction({
       date: new Date(),
       amount: 5654,
       type: 'cjsohfvs',
       description: '0fer9hgr0e9h'
     });
+
+    component.transaction = transaction;
 
     const promise = component.save();
 
@@ -102,5 +104,6 @@ describe('NewTransactionComponent', () => {
 
     await promise;
     expect(component.posting).toBe(false);
+    expect(component.transaction).toBe(transaction);
   });
 });

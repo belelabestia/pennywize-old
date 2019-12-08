@@ -10,15 +10,16 @@ import { TransactionService } from 'src/app/services/transaction.service';
 export class NewTransactionComponent {
   transaction: Transaction = new Transaction();
   posting = false;
+  error = false;
 
   constructor(private t: TransactionService) { }
 
   async save() {
     this.posting = true;
-    this.transaction = new Transaction();
 
     await this.t.post(this.transaction)
-      .catch(() => { })
+      .then(() => { this.transaction = new Transaction(); })
+      .catch(() => { this.error = true; })
       .finally(() => { this.posting = false; });
   }
 

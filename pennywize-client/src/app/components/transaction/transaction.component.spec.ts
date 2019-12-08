@@ -28,7 +28,7 @@ describe('TransactionComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('sould display transaction properties', () => {
+  it('should display transaction properties', () => {
     const date = new Date(98769876);
 
     component.transaction = new Transaction({
