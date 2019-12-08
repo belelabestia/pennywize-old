@@ -13,10 +13,13 @@ export class NewTransactionComponent {
 
   constructor(private t: TransactionService) { }
 
-  save() {
+  async save() {
     this.posting = true;
     this.transaction = new Transaction();
-    return this.t.post(this.transaction).then(() => this.posting = false);
+
+    await this.t.post(this.transaction)
+      .catch(() => { })
+      .finally(() => { this.posting = false; });
   }
 
   dateChange(date: string) {
