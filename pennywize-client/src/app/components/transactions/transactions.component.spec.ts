@@ -45,7 +45,7 @@ describe('TransactionsComponent', () => {
     expect(newTran).toBeTruthy();
   });
 
-  it('should show "loading" if there\'s no transaction', () => {
+  it('should show "loading" on startup', () => {
     const pp = Array.from(element.querySelectorAll('p'));
     expect(pp.some(p => p.innerText.includes('Loading...'))).toBeTruthy();
   });
