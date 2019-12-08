@@ -9,11 +9,17 @@ import { TransactionService } from 'src/app/services/transaction.service';
 })
 export class TransactionsComponent implements OnInit {
   transactions: Transaction[];
+  loading = false;
+  error = false;
 
-  constructor(private t: TransactionService) {}
+  constructor(private t: TransactionService) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    this.loading = true;
     this.t.transactions.subscribe(tt => this.transactions = tt);
-    this.t.get();
+
+    await this.t.get()
+      .catch(() => { this.error = true; })
+      .finally(() => { this.loading = false; });
   }
 }
