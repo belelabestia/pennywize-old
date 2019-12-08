@@ -50,9 +50,12 @@ describe('TransactionService', () => {
       }),
     ];
 
-    transactionService.transactions.subscribe(
-      tt => expect(tt).toEqual(transactions)
-    );
+    const spy = jasmine.createSpy('subscriber', tt => {
+      expect(tt).toEqual(transactions);
+    })
+      .and.callThrough();
+
+    transactionService.transactions.subscribe(spy);
 
     const promise = transactionService.get();
 
@@ -60,7 +63,8 @@ describe('TransactionService', () => {
     expect(req.request.method).toBe('GET');
     req.flush(transactions);
 
-    await promise;
+    await expectAsync(promise).toBeResolved();
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should post a transaction', async () => {
