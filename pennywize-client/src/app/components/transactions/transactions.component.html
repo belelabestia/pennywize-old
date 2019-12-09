@@ -1,4 +1,4 @@
 <p *ngIf="loading">Loading...</p>
 <p *ngIf="error">Unable to fetch transactions.</p>
-<app-transaction *ngFor="let t of transactions" [transaction]="t"></app-transaction>
+<app-transaction *ngFor="let t of transactions | async" [transaction]="t"></app-transaction>
 <app-new-transaction></app-new-transaction>

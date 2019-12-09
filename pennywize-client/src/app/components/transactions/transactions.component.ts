@@ -8,7 +8,7 @@ import { TransactionService } from 'src/app/services/transaction.service';
   styleUrls: ['./transactions.component.css']
 })
 export class TransactionsComponent implements OnInit {
-  transactions: Transaction[];
+  transactions = this.t.transactions;
   loading = false;
   error = false;
 
@@ -16,7 +16,6 @@ export class TransactionsComponent implements OnInit {
 
   async ngOnInit() {
     this.loading = true;
-    this.t.transactions.subscribe(tt => this.transactions = tt);
 
     await this.t.get()
       .catch(() => { this.error = true; })
