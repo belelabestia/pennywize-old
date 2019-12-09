@@ -4,12 +4,15 @@ import { NewTransactionComponent } from './new-transaction.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
+import { ErrorService } from 'src/app/services/error.service';
+import { Error } from 'src/app/models/error';
 
 describe('NewTransactionComponent', () => {
   let component: NewTransactionComponent;
   let fixture: ComponentFixture<NewTransactionComponent>;
   let element: HTMLElement;
   let controller: HttpTestingController;
+  let errorService: ErrorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -27,6 +30,7 @@ describe('NewTransactionComponent', () => {
     component = fixture.componentInstance;
     element = fixture.nativeElement;
     controller = TestBed.get(HttpTestingController);
+    errorService = TestBed.get(ErrorService);
     fixture.detectChanges();
   });
 
@@ -105,5 +109,22 @@ describe('NewTransactionComponent', () => {
     await promise;
     expect(component.posting).toBe(false);
     expect(component.transaction).toBe(transaction);
+  });
+
+  it('should dispatch error if saving goes wrong', async () => {
+    const spy = jasmine.createSpy('error subscriber', (error: Error) => {
+      expect(error.message).toBe('error saving transaction');
+    })
+      .and.callThrough();
+
+    errorService.error.subscribe(spy);
+
+    const promise = component.save();
+
+    const req = controller.expectOne('api/transactions');
+    req.error(new ErrorEvent('test error'));
+
+    await expectAsync(promise).toBeResolved();
+    expect(spy).toHaveBeenCalled();
   });
 });

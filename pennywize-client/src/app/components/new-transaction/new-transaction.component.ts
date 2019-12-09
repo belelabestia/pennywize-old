@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
+import { ErrorService } from 'src/app/services/error.service';
 
 @Component({
   selector: 'app-new-transaction',
@@ -10,16 +11,18 @@ import { TransactionService } from 'src/app/services/transaction.service';
 export class NewTransactionComponent {
   transaction: Transaction = new Transaction();
   posting = false;
-  error = false;
 
-  constructor(private t: TransactionService) { }
+  constructor(
+    private t: TransactionService,
+    private e: ErrorService
+  ) { }
 
   async save() {
     this.posting = true;
 
     await this.t.post(this.transaction)
       .then(() => { this.transaction = new Transaction(); })
-      .catch(() => { this.error = true; })
+      .catch(() => { this.e.dispatch('error saving transaction'); })
       .finally(() => { this.posting = false; });
   }
 
