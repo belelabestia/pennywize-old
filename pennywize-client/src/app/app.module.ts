@@ -8,6 +8,7 @@ import { TransactionsComponent } from './components/transactions/transactions.co
 import { TransactionComponent } from './components/transaction/transaction.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NewTransactionComponent } from './components/new-transaction/new-transaction.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { NewTransactionComponent } from './components/new-transaction/new-transa
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
