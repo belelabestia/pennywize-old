@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
 import { TransactionComponent } from './components/transaction/transaction.component';
 import { HttpClientModule } from '@angular/common/http';
-import { NewTransactionComponent } from './components/new-transaction/new-transaction.component';
+import { EditTransactionComponent } from './components/edit-transaction/edit-transaction.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
@@ -15,7 +15,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AppComponent,
     TransactionComponent,
     TransactionsComponent,
-    NewTransactionComponent
+    EditTransactionComponent
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewTransactionComponent } from './new-transaction.component';
+import { EditTransactionComponent } from './edit-transaction.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
@@ -8,15 +8,15 @@ import { ErrorService } from 'src/app/services/error.service';
 import { Error } from 'src/app/models/error';
 
 describe('NewTransactionComponent', () => {
-  let component: NewTransactionComponent;
-  let fixture: ComponentFixture<NewTransactionComponent>;
+  let component: EditTransactionComponent;
+  let fixture: ComponentFixture<EditTransactionComponent>;
   let element: HTMLElement;
   let controller: HttpTestingController;
   let errorService: ErrorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [NewTransactionComponent],
+      declarations: [EditTransactionComponent],
       imports: [
         FormsModule,
         HttpClientTestingModule
@@ -26,7 +26,7 @@ describe('NewTransactionComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewTransactionComponent);
+    fixture = TestBed.createComponent(EditTransactionComponent);
     component = fixture.componentInstance;
     element = fixture.nativeElement;
     controller = TestBed.get(HttpTestingController);
