@@ -14,23 +14,23 @@ export class TransactionService {
 
   constructor(private hc: HttpClient) { }
 
-  get(): Promise<void> {
-    return new Promise((resolve, reject) => this.hc.get<Transaction[]>(url).subscribe(
-      tt => {
-        this.transactionsSub.next(tt);
-        resolve();
-      },
-      err => reject()
-    ));
+  async get(): Promise<void> {
+    const tt = await this.hc.get<Transaction[]>(url).toPromise();
+    this.transactionsSub.next(tt);
   }
 
-  post(t: Transaction): Promise<void> {
-    return new Promise((resolve, reject) => this.hc.post(url, t).subscribe(
-      () => {
-        this.get();
-        resolve();
-      },
-      err => reject()
-    ));
+  async post(t: Transaction): Promise<void> {
+    await this.hc.post(url, t).toPromise();
+    this.get();
+  }
+
+  async put(t: Transaction): Promise<void> {
+    await this.hc.put(`${url}/${t.id}`, t).toPromise();
+    this.get();
+  }
+
+  async delete(t: Transaction): Promise<void> {
+    await this.hc.delete(`${url}/${t.id}`).toPromise();
+    this.get();
   }
 }

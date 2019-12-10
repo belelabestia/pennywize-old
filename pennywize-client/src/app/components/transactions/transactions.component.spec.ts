@@ -2,23 +2,25 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TransactionsComponent } from './transactions.component';
 import { TransactionComponent } from '../transaction/transaction.component';
-import { NewTransactionComponent } from '../new-transaction/new-transaction.component';
+import { EditTransactionComponent } from '../edit-transaction/edit-transaction.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
+import { ErrorService } from 'src/app/services/error.service';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
   let fixture: ComponentFixture<TransactionsComponent>;
   let controller: HttpTestingController;
   let element: HTMLElement;
+  let errorService: ErrorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
         TransactionsComponent,
         TransactionComponent,
-        NewTransactionComponent
+        EditTransactionComponent
       ],
       imports: [
         FormsModule,
@@ -33,21 +35,12 @@ describe('TransactionsComponent', () => {
     component = fixture.componentInstance;
     element = fixture.nativeElement;
     controller = TestBed.get(HttpTestingController);
+    errorService = TestBed.get(ErrorService);
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should contain new transaction', () => {
-    const newTran = element.querySelector('app-new-transaction');
-    expect(newTran).toBeTruthy();
-  });
-
-  it('should show "loading" on startup', () => {
-    const pp = Array.from(element.querySelectorAll('p'));
-    expect(pp.some(p => p.innerText.includes('Loading...'))).toBeTruthy();
   });
 
   it('should show transactions', async () => {
@@ -78,11 +71,49 @@ describe('TransactionsComponent', () => {
   });
 
   it('should handle fetch error', async () => {
+    const spy = jasmine.createSpy('error subscriber');
+    errorService.error.subscribe(spy);
+
     const req = controller.expectOne('api/transactions');
     req.error(new ErrorEvent('test error'));
 
     await fixture.whenStable();
-    expect(component.error).toBe(true);
-    expect(component.loading).toBe(false);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should edit when app-transaction emits', async () => {
+    const edit = () => element.querySelector('app-edit-transaction');
+
+    expect(edit()).toBeFalsy();
+
+    await fixture.whenStable();
+
+    const transaction = new Transaction({
+      id: 'dehwofh0ew',
+      amount: -51,
+      date: new Date(93935585),
+      description: 'hrf80wyhrg',
+      type: 'fhr9fher'
+    });
+
+    component.edit(transaction);
+
+    fixture.detectChanges();
+
+    expect(edit()).toBeTruthy();
+  });
+
+  it('should edit new on add button click', async () => {
+    const edit = () => element.querySelector('app-edit-transaction');
+
+    expect(edit()).toBeFalsy();
+
+    await fixture.whenStable();
+
+    component.add();
+
+    fixture.detectChanges();
+
+    expect(edit()).toBeTruthy();
   });
 });

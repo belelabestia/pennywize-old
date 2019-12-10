@@ -1,4 +1,3 @@
-<p *ngIf="loading">Loading...</p>
-<p *ngIf="error">Unable to fetch transactions.</p>
-<app-transaction *ngFor="let t of transactions | async" [transaction]="t"></app-transaction>
-<app-new-transaction></app-new-transaction>
+<app-transaction *ngFor="let t of transactions | async" [transaction]="t" (selected)="edit(t)"></app-transaction>
+<app-edit-transaction *ngIf="canEdit" [transaction]="current" (save)="save()" (cancel)="cancel()" (delete)="delete()" [disabled]="sending"></app-edit-transaction>
+<button *ngIf="canAdd" (click)="add()">Add</button>

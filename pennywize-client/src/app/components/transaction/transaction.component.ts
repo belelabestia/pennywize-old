@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 
 @Component({
@@ -8,4 +8,9 @@ import { Transaction } from 'src/app/models/transaction';
 })
 export class TransactionComponent {
   @Input() transaction: Transaction;
+  @Output() selected = new EventEmitter<void>();
+
+  @HostListener('click') emitSelected() {
+    this.selected.emit();
+  }
 }

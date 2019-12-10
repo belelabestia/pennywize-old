@@ -1,31 +1,37 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 
 @Component({
   selector: 'app-edit-transaction',
   templateUrl: './edit-transaction.component.html',
-  styleUrls: ['./edit-transaction.component.css']
+  styleUrls: ['./edit-transaction.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditTransactionComponent {
   @Input() transaction: Transaction;
-  
-  @Output() saveClick = new EventEmitter<void>();
-  @Output() cancelClick = new EventEmitter<void>();
-  @Output() deleteClick = new EventEmitter<void>();
+  @Input() disabled = false;
+
+  @Output() save = new EventEmitter<void>();
+  @Output() cancel = new EventEmitter<void>();
+  @Output() delete = new EventEmitter<void>();
+
+  get canDelete() {
+    return !!this.transaction.id;
+  }
 
   dateChange(date: string) {
     this.transaction.date = new Date(date);
   }
 
-  save() {
-    this.saveClick.emit();
+  emitSave() {
+    this.save.emit();
   }
 
-  cancel() {
-    this.cancelClick.emit();
+  emitCancel() {
+    this.cancel.emit();
   }
 
-  delete() {
-    this.deleteClick.emit();
+  emitDelete() {
+    this.delete.emit();
   }
 }
