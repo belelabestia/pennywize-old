@@ -4,25 +4,25 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TransactionService } from './transaction.service';
 import { Transaction } from '../models/transaction';
 
-describe('TransactionService', () => {
-  let httpTestingController: HttpTestingController;
-  let transactionService: TransactionService;
+fdescribe('TransactionService', () => {
+  let controller: HttpTestingController;
+  let service: TransactionService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule]
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    transactionService = TestBed.get(TransactionService);
+    controller = TestBed.get(HttpTestingController);
+    service = TestBed.get(TransactionService);
   });
 
   afterEach(() => {
-    httpTestingController.verify();
+    controller.verify();
   });
 
   it('should be created', () => {
-    expect(transactionService).toBeTruthy();
+    expect(service).toBeTruthy();
   });
 
   it('should get transactions', async () => {
@@ -55,11 +55,11 @@ describe('TransactionService', () => {
     })
       .and.callThrough();
 
-    transactionService.transactions.subscribe(spy);
+    service.transactions.subscribe(spy);
 
-    const promise = transactionService.get();
+    const promise = service.get();
 
-    const req = httpTestingController.expectOne('api/transactions');
+    const req = controller.expectOne('api/transactions');
     expect(req.request.method).toBe('GET');
     req.flush(transactions);
 
@@ -76,37 +76,47 @@ describe('TransactionService', () => {
       description: 'dasjifo8hfh8f'
     });
 
-    transactionService.transactions.subscribe(tt =>
-      expect(tt).toContain(transaction)
-    );
+    const spy = jasmine.createSpy('subscriber', tt => {
+      expect(tt).toContain(transaction);
+    })
+      .and.callThrough();
 
-    const promise = transactionService.post(transaction);
+    service.transactions.subscribe(spy);
 
-    const req0 = httpTestingController.expectOne('api/transactions');
-    expect(req0.request.method).toBe('POST');
-    req0.flush(transaction);
+    const post = service.post(transaction);
 
-    const req1 = httpTestingController.expectOne('api/transactions');
-    expect(req1.request.method).toBe('GET');
-    req1.flush([transaction]);
+    controller.expectOne('api/transactions').flush(transaction);
+    controller.expectOne('api/transactions').flush([transaction]);
 
-    await promise;
+    await expectAsync(post).toBeResolved();
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('should handle an http error on get', async () => {
-    const promise = transactionService.get();
+  it('should put a transaction', async () => {
+    const transaction = new Transaction({
+      id: 'fhtc5ueyc89ny',
+      amount: 843,
+      date: new Date(),
+      type: 'y49w8tgh',
+      description: 'description'
+    });
 
-    const req = httpTestingController.expectOne('api/transactions');
-    req.error(new ErrorEvent('test error'));
+    const put = service.put(transaction);
 
-    await expectAsync(promise).toBeRejected();
+    controller.expectOne('api/transactions/fhtc5ueyc89ny').flush(null);
+    controller.expectOne('api/transactions').flush([transaction]);
+
+    await expectAsync(put).toBeResolved();
   });
 
-  it('should handle an http error on post', async () => {
-    const promise = transactionService.post(new Transaction());
-    const req = httpTestingController.expectOne('api/transactions');
-    req.error(new ErrorEvent('test error'));
+  it('should delete a transaction', async () => {
+    const $delete = service.delete(new Transaction({
+      id: 'u0few8rh0g'
+    }));
 
-    await expectAsync(promise).toBeRejected();
+    controller.expectOne('api/transactions/u0few8rh0g').flush(null);
+    controller.expectOne('api/transactions').flush([]);
+
+    await expectAsync($delete).toBeResolved();
   });
 });
