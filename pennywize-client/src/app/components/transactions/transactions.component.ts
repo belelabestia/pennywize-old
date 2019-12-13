@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { ErrorService } from 'src/app/services/error.service';
@@ -24,7 +24,8 @@ export class TransactionsComponent implements OnInit {
 
   constructor(
     private t: TransactionService,
-    private e: ErrorService
+    private e: ErrorService,
+    private cd: ChangeDetectorRef
   ) { }
 
   async ngOnInit() {
@@ -47,7 +48,10 @@ export class TransactionsComponent implements OnInit {
 
     await operation()
       .catch(() => { this.e.dispatch('error saving transaction'); })
-      .finally(() => { this.requesting = false; });
+      .finally(() => {
+        this.cd.markForCheck();
+        this.requesting = false;
+      });
   }
 
   cancel() {
@@ -58,7 +62,11 @@ export class TransactionsComponent implements OnInit {
     this.requesting = true;
     await this.t.delete(this.current)
       .catch(() => { this.e.dispatch('error deleting transaction'); })
-      .finally(() => this.requesting = false);
+      .finally(() => {
+        this.cd.markForCheck();
+        this.requesting = false;
+        this.current = null;
+      });
   }
 
   private async post() {
