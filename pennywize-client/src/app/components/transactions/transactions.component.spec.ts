@@ -123,4 +123,29 @@ describe('TransactionsComponent', () => {
 
     expect(edit()).toBeTruthy();
   });
+
+  it('should empty current transaction when deleted', async () => {
+    const transaction = new Transaction({
+      id: 'f9ewujg',
+      amount: 50,
+      date: new Date(33380058),
+      description: 'fj0ew89yge0h',
+      type: 'jivd'
+    });
+
+    controller.expectOne('api/transactions').flush([transaction]);
+
+    await fixture.whenStable();
+
+    component.current = transaction;
+
+    const del = component.delete();
+
+    controller.expectOne('api/transactions/f9ewujg').flush(null);
+
+    await expectAsync(del).toBeResolved();
+
+    expect(component.current).toBeNull();
+    expect(component.requesting).toBe(false);
+  });
 });
