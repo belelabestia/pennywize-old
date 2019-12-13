@@ -21,32 +21,11 @@ describe('TransactionComponent', () => {
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
     element = fixture.nativeElement;
-    fixture.detectChanges();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should display transaction properties', () => {
-    const date = new Date(98769876);
-
-    component.transaction = new Transaction({
-      id: 'o4gh80ghw408h',
-      amount: 348,
-      date,
-      type: 'fgiopeh',
-      description: '048ewh0vihcr0'
-    });
-
+    component.transaction = new Transaction();
     fixture.detectChanges();
-
-    const text = element.textContent;
-
-    expect(text).toContain('id: o4gh80ghw408h');
-    expect(text).toContain('amount: 348');
-    expect(text).toContain(`date: ${date}`);
-    expect(text).toContain('type: fgiopeh');
-    expect(text).toContain('description: 048ewh0vihcr0');
+    expect(component).toBeTruthy();
   });
 });

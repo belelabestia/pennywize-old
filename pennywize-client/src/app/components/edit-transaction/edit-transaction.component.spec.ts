@@ -29,19 +29,9 @@ describe('EditTransactionComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show cancel when transaction hasn\'t id', () => {
-    component.transaction = new Transaction();
-    fixture.detectChanges();
-
-    expect(component.canCancel).toBe(true);
-    expect(component.canDelete).toBe(false);
-  });
-
   it('should show delete when transaction has id', () => {
     component.transaction = new Transaction({ id: 'j40rj3f98rh0' });
     fixture.detectChanges();
-
-    expect(component.canCancel).toBe(false);
     expect(component.canDelete).toBe(true);
   });
 

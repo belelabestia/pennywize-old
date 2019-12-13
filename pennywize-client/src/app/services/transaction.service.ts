@@ -21,20 +21,17 @@ export class TransactionService {
   }
 
   async post(t: Transaction): Promise<void> {
-    await this.hc.post(url, t)
-      .pipe(map(() => { this.get(); }))
-      .toPromise();
+    await this.hc.post(url, t).toPromise();
+    this.get();
   }
 
   async put(t: Transaction): Promise<void> {
-    await this.hc.put(`${url}/${t.id}`, t)
-      .pipe(map(() => { this.get(); }))
-      .toPromise();
+    await this.hc.put(`${url}/${t.id}`, t).toPromise();
+    this.get();
   }
 
   async delete(t: Transaction): Promise<void> {
-    await this.hc.delete(`${url}/${t.id}`)
-      .pipe(map(() => { this.get(); }))
-      .toPromise();
+    await this.hc.delete(`${url}/${t.id}`).toPromise();
+    this.get();
   }
 }

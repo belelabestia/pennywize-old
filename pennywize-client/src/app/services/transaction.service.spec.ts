@@ -3,8 +3,9 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { TransactionService } from './transaction.service';
 import { Transaction } from '../models/transaction';
+import { first } from 'rxjs/operators';
 
-fdescribe('TransactionService', () => {
+describe('TransactionService', () => {
   let controller: HttpTestingController;
   let service: TransactionService;
 
@@ -50,21 +51,15 @@ fdescribe('TransactionService', () => {
       }),
     ];
 
-    const spy = jasmine.createSpy('subscriber', tt => {
-      expect(tt).toEqual(transactions);
-    })
-      .and.callThrough();
+    const tt = service.transactions.pipe(first()).toPromise();
 
-    service.transactions.subscribe(spy);
-
-    const promise = service.get();
+    const get = service.get();
 
     const req = controller.expectOne('api/transactions');
     expect(req.request.method).toBe('GET');
     req.flush(transactions);
 
-    await expectAsync(promise).toBeResolved();
-    expect(spy).toHaveBeenCalled();
+    await expectAsync(Promise.all([get, tt])).toBeResolved();
   });
 
   it('should post a transaction', async () => {
@@ -76,20 +71,16 @@ fdescribe('TransactionService', () => {
       description: 'dasjifo8hfh8f'
     });
 
-    const spy = jasmine.createSpy('subscriber', tt => {
-      expect(tt).toContain(transaction);
-    })
-      .and.callThrough();
+    const tt = service.transactions.pipe(first()).toPromise();
 
-    service.transactions.subscribe(spy);
+    const post = service.post(transaction)
+      .then(() => {
+        controller.expectOne('api/transactions', 'get').flush([transaction]);
+      });
 
-    const post = service.post(transaction);
+    controller.expectOne('api/transactions', 'post').flush(transaction);
 
-    controller.expectOne('api/transactions').flush(transaction);
-    controller.expectOne('api/transactions').flush([transaction]);
-
-    await expectAsync(post).toBeResolved();
-    expect(spy).toHaveBeenCalled();
+    await expectAsync(Promise.all([post, tt])).toBeResolved();
   });
 
   it('should put a transaction', async () => {
@@ -101,10 +92,11 @@ fdescribe('TransactionService', () => {
       description: 'description'
     });
 
-    const put = service.put(transaction);
+    const put = service.put(transaction).then(() => {
+      controller.expectOne('api/transactions').flush([transaction]);
+    });
 
     controller.expectOne('api/transactions/fhtc5ueyc89ny').flush(null);
-    controller.expectOne('api/transactions').flush([transaction]);
 
     await expectAsync(put).toBeResolved();
   });
@@ -112,10 +104,12 @@ fdescribe('TransactionService', () => {
   it('should delete a transaction', async () => {
     const $delete = service.delete(new Transaction({
       id: 'u0few8rh0g'
-    }));
+    }))
+      .then(() => {
+        controller.expectOne('api/transactions').flush([]);
+      });
 
     controller.expectOne('api/transactions/u0few8rh0g').flush(null);
-    controller.expectOne('api/transactions').flush([]);
 
     await expectAsync($delete).toBeResolved();
   });

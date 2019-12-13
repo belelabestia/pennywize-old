@@ -7,6 +7,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
 import { ErrorService } from 'src/app/services/error.service';
+import { first } from 'rxjs/operators';
+import { ChangeDetectionStrategy } from '@angular/core';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
@@ -27,6 +29,9 @@ describe('TransactionsComponent', () => {
         HttpClientTestingModule
       ]
     })
+      .overrideComponent(TransactionsComponent, {
+        set: { changeDetection: ChangeDetectionStrategy.Default }
+      })
       .compileComponents();
   }));
 
@@ -63,7 +68,11 @@ describe('TransactionsComponent', () => {
       })
     ]);
 
-    await fixture.whenStable();
+    const stable = fixture.whenStable();
+    const received = component.transactions.pipe(first()).toPromise();
+
+    await expectAsync(Promise.all([stable, received])).toBeResolved();
+
     fixture.detectChanges();
 
     const transactions = element.querySelectorAll('app-transaction');
@@ -71,22 +80,16 @@ describe('TransactionsComponent', () => {
   });
 
   it('should handle fetch error', async () => {
-    const spy = jasmine.createSpy('error subscriber');
-    errorService.error.subscribe(spy);
+    const err = errorService.error.pipe(first()).toPromise();
+    const stable = fixture.whenStable();
 
-    const req = controller.expectOne('api/transactions');
-    req.error(new ErrorEvent('test error'));
+    controller.expectOne('api/transactions').error(new ErrorEvent('test error'));
 
-    await fixture.whenStable();
-    expect(spy).toHaveBeenCalled();
+    await expectAsync(Promise.all([err, stable])).toBeResolved();
   });
 
   it('should edit when app-transaction emits', async () => {
     const edit = () => element.querySelector('app-edit-transaction');
-
-    expect(edit()).toBeFalsy();
-
-    await fixture.whenStable();
 
     const transaction = new Transaction({
       id: 'dehwofh0ew',
@@ -95,6 +98,10 @@ describe('TransactionsComponent', () => {
       description: 'hrf80wyhrg',
       type: 'fhr9fher'
     });
+
+    await fixture.whenStable();
+
+    expect(edit()).toBeFalsy();
 
     component.edit(transaction);
 
