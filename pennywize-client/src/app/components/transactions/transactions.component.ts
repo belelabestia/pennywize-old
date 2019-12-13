@@ -12,7 +12,7 @@ import { ErrorService } from 'src/app/services/error.service';
 export class TransactionsComponent implements OnInit {
   transactions = this.t.transactions;
   current: Transaction;
-  requestInProgress = false;
+  requesting = false;
 
   get canAdd() {
     return !this.current;
@@ -41,13 +41,13 @@ export class TransactionsComponent implements OnInit {
   }
 
   async save() {
-    this.requestInProgress = true;
+    this.requesting = true;
 
     const operation = this.current.id ? () => this.put() : () => this.post();
 
     await operation()
       .catch(() => { this.e.dispatch('error saving transaction'); })
-      .finally(() => { this.requestInProgress = false; });
+      .finally(() => { this.requesting = false; });
   }
 
   cancel() {
@@ -55,10 +55,10 @@ export class TransactionsComponent implements OnInit {
   }
 
   async delete() {
-    this.requestInProgress = true;
+    this.requesting = true;
     await this.t.delete(this.current)
       .catch(() => { this.e.dispatch('error deleting transaction'); })
-      .finally(() => this.requestInProgress = false);
+      .finally(() => this.requesting = false);
   }
 
   private async post() {
