@@ -1,7 +1,16 @@
-<input [disabled]="disabled" required type="date" [ngModel]="transaction.date | date: 'yyyy-MM-dd'" (ngModelChange)="dateChange($event)" placeholder="date">
-<input [disabled]="disabled" required type="number" [(ngModel)]="transaction.amount" placeholder="amount">
-<input [disabled]="disabled" required type="text" [(ngModel)]="transaction.type" placeholder="type">
-<input [disabled]="disabled" required type="text" [(ngModel)]="transaction.description" placeholder="description">
+<mat-form-field>
+    <input matInput [disabled]="disabled" required type="date" [ngModel]="transaction.date | date: 'yyyy-MM-dd'" (ngModelChange)="dateChange($event)" placeholder="date">
+</mat-form-field>
+<mat-form-field>
+    <input matInput [disabled]="disabled" required type="number" [(ngModel)]="transaction.amount" placeholder="amount">
+</mat-form-field>
+<mat-form-field>
+    <input matInput [disabled]="disabled" required type="text" [(ngModel)]="transaction.type" placeholder="type">
+</mat-form-field>
+<mat-form-field>
+    <input matInput [disabled]="disabled" required type="text" [(ngModel)]="transaction.description" placeholder="description">
+</mat-form-field>
+
 <button [disabled]="disabled" (click)="emitSave()">Save</button>
 <button [disabled]="disabled" (click)="emitDelete()" *ngIf="canDelete">Delete</button>
 <button [disabled]="disabled" (click)="emitCancel()">Cancel</button>

@@ -28,8 +28,13 @@ app-transaction {
 
 #edit {
     flex: 0 0 350px;
+    box-sizing: border-box;
+    padding: 24px;
+    border-left: 1px solid lightgrey;
 }
 
 :host.mobile #edit {
     flex: 0 0 150px;
+    border-left: none;
+    border-top: 1px solid lightgrey;
 }
