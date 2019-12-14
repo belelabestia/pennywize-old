@@ -10,6 +10,7 @@ import { ErrorService } from 'src/app/services/error.service';
 import { first } from 'rxjs/operators';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { MaterialModule } from 'src/app/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
@@ -28,7 +29,8 @@ describe('TransactionsComponent', () => {
       imports: [
         FormsModule,
         HttpClientTestingModule,
-        MaterialModule
+        MaterialModule,
+        BrowserAnimationsModule
       ]
     })
       .overrideComponent(TransactionsComponent, {

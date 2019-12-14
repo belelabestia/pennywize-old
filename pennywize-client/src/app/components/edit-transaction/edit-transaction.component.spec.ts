@@ -3,6 +3,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { EditTransactionComponent } from './edit-transaction.component';
 import { FormsModule } from '@angular/forms';
 import { Transaction } from 'src/app/models/transaction';
+import { MaterialModule } from 'src/app/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('EditTransactionComponent', () => {
   let component: EditTransactionComponent;
@@ -12,7 +14,11 @@ describe('EditTransactionComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [EditTransactionComponent],
-      imports: [FormsModule]
+      imports: [
+        FormsModule,
+        MaterialModule,
+        BrowserAnimationsModule
+      ]
     })
       .compileComponents();
   }));
