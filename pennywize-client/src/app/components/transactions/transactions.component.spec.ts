@@ -9,6 +9,7 @@ import { Transaction } from 'src/app/models/transaction';
 import { ErrorService } from 'src/app/services/error.service';
 import { first } from 'rxjs/operators';
 import { ChangeDetectionStrategy } from '@angular/core';
+import { MaterialModule } from 'src/app/material.module';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
@@ -26,7 +27,8 @@ describe('TransactionsComponent', () => {
       ],
       imports: [
         FormsModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        MaterialModule
       ]
     })
       .overrideComponent(TransactionsComponent, {

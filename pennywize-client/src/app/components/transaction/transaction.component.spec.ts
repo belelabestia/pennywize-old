@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TransactionComponent } from './transaction.component';
 import { FormsModule } from '@angular/forms';
 import { Transaction } from 'src/app/models/transaction';
+import { MaterialModule } from 'src/app/material.module';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -12,7 +13,7 @@ describe('TransactionComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ TransactionComponent ],
-      imports: [ FormsModule ]
+      imports: [ FormsModule, MaterialModule ]
     })
     .compileComponents();
   }));
