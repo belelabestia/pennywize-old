@@ -9,20 +9,22 @@ import { TransactionComponent } from './components/transaction/transaction.compo
 import { HttpClientModule } from '@angular/common/http';
 import { EditTransactionComponent } from './components/edit-transaction/edit-transaction.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './material.module';
 
 @NgModule({
   declarations: [
     AppComponent,
     TransactionComponent,
     TransactionsComponent,
-    EditTransactionComponent
+    EditTransactionComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    MaterialModule
   ],
   providers: [],
   bootstrap: [AppComponent]
