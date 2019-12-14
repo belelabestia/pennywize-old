@@ -16,6 +16,10 @@
     padding: 24px;
 }
 
+app-transaction {
+    margin: 5px 0;
+}
+
 #add {
     position: fixed;
     bottom: 30px;
