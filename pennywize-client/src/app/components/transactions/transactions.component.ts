@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostBinding } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { ErrorService } from 'src/app/services/error.service';
@@ -10,6 +11,7 @@ import { ErrorService } from 'src/app/services/error.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionsComponent implements OnInit {
+  @HostBinding('class.mobile') isMobile = false;
   transactions = this.t.transactions;
   current: Transaction;
   requesting = false;
@@ -25,12 +27,17 @@ export class TransactionsComponent implements OnInit {
   constructor(
     private t: TransactionService,
     private e: ErrorService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private bo: BreakpointObserver
   ) { }
 
   async ngOnInit() {
     await this.t.get()
       .catch(() => { this.e.dispatch('error loading transactions'); });
+
+    this.bo.observe([Breakpoints.Handset]).subscribe(result => {
+      this.isMobile = result.matches;
+    });
   }
 
   add() {

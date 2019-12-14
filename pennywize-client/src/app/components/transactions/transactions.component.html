@@ -1,3 +1,5 @@
-<app-transaction *ngFor="let t of transactions | async" [transaction]="t" (selected)="edit(t)"></app-transaction>
+<div id="transactions">
+    <app-transaction *ngFor="let t of transactions | async" [transaction]="t" (selected)="edit(t)"></app-transaction>
+    <button id="add" *ngIf="canAdd" (click)="add()">Add</button>
+</div>
 <app-edit-transaction *ngIf="canEdit" [transaction]="current" (save)="save()" (cancel)="cancel()" (delete)="delete()" [disabled]="requesting"></app-edit-transaction>
-<button *ngIf="canAdd" (click)="add()">Add</button>
