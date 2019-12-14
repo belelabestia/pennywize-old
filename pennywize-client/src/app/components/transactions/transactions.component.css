@@ -1,6 +1,7 @@
 :host {
     height: 100%;
     display: flex;
+    position: relative;
 }
 
 :host.mobile {
@@ -8,15 +9,23 @@
 }
 
 #transactions {
-    width: 100%;
+    flex: 1 1 auto;
     height: 100%;
-    position: relative;
-    padding: 24px;
+    overflow: auto;
     box-sizing: border-box;
+    padding: 24px;
 }
 
 #add {
-    position: absolute;
+    position: fixed;
     bottom: 30px;
     right: 30px;
+}
+
+#edit {
+    flex: 0 0 350px;
+}
+
+:host.mobile #edit {
+    flex: 0 0 150px;
 }
