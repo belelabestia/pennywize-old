@@ -3,5 +3,5 @@
     <button class="mat-elevation-z2" mat-fab id="add" *ngIf="canAdd" (click)="add()"><mat-icon>add</mat-icon></button>
 </div>
 <div *ngIf="canEdit" id="edit">
-    <app-edit-transaction [transaction]="current" (save)="save()" (cancel)="cancel()" (delete)="delete()" [disabled]="requesting"></app-edit-transaction>
+    <app-edit-transaction [transaction]="current" (save)="save($event)" (cancel)="cancel()" (delete)="delete()" [disabled]="requesting"></app-edit-transaction>
 </div>

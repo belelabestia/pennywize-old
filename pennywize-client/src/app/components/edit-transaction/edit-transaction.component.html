@@ -1,30 +1,27 @@
-<div id="form">
-    <mat-form-field appearance="outline">
-        <input matInput #date="ngModel" [disabled]="disabled" required [matDatepicker]="picker"
-            [(ngModel)]="transaction.date" placeholder="Date">
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-        <mat-error *ngIf="date.invalid">This field is required</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-        <input matInput #amount="ngModel" [disabled]="disabled" required type="number" [(ngModel)]="transaction.amount"
-            placeholder="Amount">
-        <mat-error *ngIf="amount.invalid">This field is required</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-        <input matInput #type="ngModel" [disabled]="disabled" required type="text" [(ngModel)]="transaction.type"
-            placeholder="Type">
-        <mat-error *ngIf="type.invalid">This field is required</mat-error>
-    </mat-form-field>
-    <mat-form-field appearance="outline">
-        <input matInput #description="ngModel" [disabled]="disabled" required type="text"
-            [(ngModel)]="transaction.description" placeholder="Description">
-        <mat-error *ngIf="description.invalid">This field is required</mat-error>
-    </mat-form-field>
-</div>
-<div id="buttons">
-    <button mat-raised-button color="primary" [disabled]="disabled" (click)="emitSave()">Save</button>
-    <button mat-raised-button color="warn" [disabled]="disabled" (click)="emitDelete()"
-        *ngIf="canDelete">Delete</button>
-    <button mat-stroked-button [disabled]="disabled" (click)="emitCancel()">Cancel</button>
-</div>
+<form id="form" [formGroup]="form" (ngSubmit)="emitSave()">
+    <div id="fields">
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="date" [matDatepicker]="picker" placeholder="Date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <!-- <mat-error *ngIf="date.invalid">This field is required</mat-error> -->
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="amount" type="number" placeholder="Amount">
+            <!-- <mat-error *ngIf="amount.invalid">This field is required</mat-error> -->
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="type" type="text" placeholder="Type">
+            <!-- <mat-error *ngIf="type.invalid">This field is required</mat-error> -->
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="description" type="text" placeholder="Description">
+            <!-- <mat-error *ngIf="description.invalid">This field is required</mat-error> -->
+        </mat-form-field>    
+    </div>
+    <div id="buttons">
+        <button type="submit" mat-raised-button color="primary" [disabled]="disabled">Save</button>
+        <button mat-raised-button color="warn" (click)="emitDelete()" *ngIf="canDelete" [disabled]="disabled">Delete</button>
+        <button mat-stroked-button (click)="emitCancel()" [disabled]="disabled">Cancel</button>
+    </div>
+</form>

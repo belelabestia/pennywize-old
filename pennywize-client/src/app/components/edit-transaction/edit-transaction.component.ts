@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-transaction',
@@ -8,19 +9,44 @@ import { Transaction } from 'src/app/models/transaction';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditTransactionComponent {
-  @Input() transaction: Transaction;
-  @Input() disabled = false;
+  form = this.fb.group({
+    id: [''],
+    amount: ['', Validators.required],
+    date: ['', Validators.required],
+    type: ['', Validators.required],
+    description: ['', Validators.required]
+  });
 
-  @Output() save = new EventEmitter<void>();
+  @Output() save = new EventEmitter<Transaction>();
   @Output() cancel = new EventEmitter<void>();
   @Output() delete = new EventEmitter<void>();
+
+  @Input() set transaction(t: Transaction) {
+    this.updateForm(t, this.disabled);
+  }
+
+  get transaction(): Transaction {
+    return this.form ? new Transaction(this.form.value) : undefined;
+  }
+
+  @Input() set disabled(d: boolean) {
+    this.updateForm(this.transaction, d);
+  }
+
+  get disabled(): boolean {
+    return this.form ? this.form.disabled : false;
+  }
 
   get canDelete() {
     return !!this.transaction.id;
   }
 
+  constructor(private fb: FormBuilder) { }
+
   emitSave() {
-    this.save.emit();
+    if (this.form && this.form.valid) {
+      this.save.emit(this.transaction);
+    }
   }
 
   emitCancel() {
@@ -29,5 +55,19 @@ export class EditTransactionComponent {
 
   emitDelete() {
     this.delete.emit();
+  }
+
+  private updateForm(transaction: Transaction, disabled: boolean) {
+    if (!transaction) {
+      return;
+    }
+
+    this.form.patchValue(transaction);
+
+    if (disabled) {
+      this.form.disable();
+    } else {
+      this.form.enable();
+    }
   }
 }

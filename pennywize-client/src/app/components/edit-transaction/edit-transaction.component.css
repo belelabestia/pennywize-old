@@ -1,4 +1,4 @@
-:host {
+#form {
     display: grid;
     height: 100%;
     grid-template-rows: 1fr 0fr;
@@ -16,6 +16,6 @@
     margin-right: 6px;
 }
 
-#form > * {
+#fields > * {
     width: 100%;
 }

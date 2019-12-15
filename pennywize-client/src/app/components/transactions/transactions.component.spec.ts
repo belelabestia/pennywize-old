@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { TransactionsComponent } from './transactions.component';
 import { TransactionComponent } from '../transaction/transaction.component';
 import { EditTransactionComponent } from '../edit-transaction/edit-transaction.component';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
 import { ErrorService } from 'src/app/services/error.service';
@@ -27,7 +27,7 @@ describe('TransactionsComponent', () => {
         EditTransactionComponent
       ],
       imports: [
-        FormsModule,
+        ReactiveFormsModule,
         HttpClientTestingModule,
         MaterialModule,
         BrowserAnimationsModule

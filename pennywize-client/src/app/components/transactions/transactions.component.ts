@@ -48,8 +48,9 @@ export class TransactionsComponent implements OnInit {
     this.current = new Transaction(transaction);
   }
 
-  async save() {
+  async save(t: Transaction) {
     this.requesting = true;
+    this.current = t;
 
     const operation = this.current.id ? () => this.put() : () => this.post();
 
