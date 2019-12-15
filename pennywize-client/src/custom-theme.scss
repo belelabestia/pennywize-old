@@ -26,3 +26,7 @@ $pennywize-client-theme: mat-light-theme($pennywize-client-primary, $pennywize-c
 // that you are using.
 @include angular-material-theme($pennywize-client-theme);
 
+.mat-card:not([class*=mat-elevation-z]) {
+    border: 1px solid lightgrey;
+    box-shadow: none;
+}

@@ -1,16 +1,30 @@
-<mat-form-field>
-    <input matInput [disabled]="disabled" required type="date" [ngModel]="transaction.date | date: 'yyyy-MM-dd'" (ngModelChange)="dateChange($event)" placeholder="date">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [disabled]="disabled" required type="number" [(ngModel)]="transaction.amount" placeholder="amount">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [disabled]="disabled" required type="text" [(ngModel)]="transaction.type" placeholder="type">
-</mat-form-field>
-<mat-form-field>
-    <input matInput [disabled]="disabled" required type="text" [(ngModel)]="transaction.description" placeholder="description">
-</mat-form-field>
-
-<button [disabled]="disabled" (click)="emitSave()">Save</button>
-<button [disabled]="disabled" (click)="emitDelete()" *ngIf="canDelete">Delete</button>
-<button [disabled]="disabled" (click)="emitCancel()">Cancel</button>
+<div id="form">
+    <mat-form-field appearance="outline">
+        <input matInput #date="ngModel" [disabled]="disabled" required [matDatepicker]="picker"
+            [(ngModel)]="transaction.date" placeholder="Date">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="date.invalid">This field is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <input matInput #amount="ngModel" [disabled]="disabled" required type="number" [(ngModel)]="transaction.amount"
+            placeholder="Amount">
+        <mat-error *ngIf="amount.invalid">This field is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <input matInput #type="ngModel" [disabled]="disabled" required type="text" [(ngModel)]="transaction.type"
+            placeholder="Type">
+        <mat-error *ngIf="type.invalid">This field is required</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+        <input matInput #description="ngModel" [disabled]="disabled" required type="text"
+            [(ngModel)]="transaction.description" placeholder="Description">
+        <mat-error *ngIf="description.invalid">This field is required</mat-error>
+    </mat-form-field>
+</div>
+<div id="buttons">
+    <button mat-raised-button color="primary" [disabled]="disabled" (click)="emitSave()">Save</button>
+    <button mat-raised-button color="warn" [disabled]="disabled" (click)="emitDelete()"
+        *ngIf="canDelete">Delete</button>
+    <button mat-stroked-button [disabled]="disabled" (click)="emitCancel()">Cancel</button>
+</div>

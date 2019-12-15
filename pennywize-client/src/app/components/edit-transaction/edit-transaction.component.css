@@ -1,0 +1,21 @@
+:host {
+    display: grid;
+    height: 100%;
+    grid-template-rows: 1fr 0fr;
+}
+
+#buttons {
+    text-align: right;
+}
+
+#buttons > * {
+    width: 80px;
+}
+
+#buttons > *:not(:last-child) {
+    margin-right: 6px;
+}
+
+#form > * {
+    width: 100%;
+}
