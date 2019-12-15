@@ -40,31 +40,4 @@ describe('EditTransactionComponent', () => {
     fixture.detectChanges();
     expect(component.canDelete).toBe(true);
   });
-
-  it('should bind view fields to property', () => {
-    const t = new Transaction();
-    component.transaction = t;
-
-    fixture.detectChanges();
-
-    const dateChangeSpy = spyOn(component, 'dateChange').and.callThrough();
-
-    const [date, amount, type, description] = Array.from(element.querySelectorAll('input'));
-
-    date.valueAsDate = new Date('2012-05-15');
-    amount.valueAsNumber = 214;
-    type.value = 'fj0j';
-    description.value = 'hd40rvefss';
-
-    [date, amount, type, description].forEach(i => i.dispatchEvent(new Event('input')));
-
-    expect(dateChangeSpy).toHaveBeenCalledWith('2012-05-15');
-
-    expect(
-      t.date.getTime() == date.valueAsDate.getTime() &&
-      t.amount == amount.valueAsNumber &&
-      t.type == type.value &&
-      t.description == description.value
-    ).toBeTruthy();
-  });
 });

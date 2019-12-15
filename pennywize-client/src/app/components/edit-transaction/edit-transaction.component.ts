@@ -19,10 +19,6 @@ export class EditTransactionComponent {
     return !!this.transaction.id;
   }
 
-  dateChange(date: string) {
-    this.transaction.date = new Date(date);
-  }
-
   emitSave() {
     this.save.emit();
   }
