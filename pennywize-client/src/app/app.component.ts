@@ -1,7 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { map } from 'rxjs/operators';
 import { ErrorService } from './services/error.service';
 import { Subscription } from 'rxjs';
+import { OAuthService, JwksValidationHandler, OAuthStorage } from 'angular-oauth2-oidc';
+import { authCodeFlowConfig } from './services/auth-config';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -12,10 +14,17 @@ export class AppComponent implements OnInit, OnDestroy {
   errorMessage: string;
   subscription: Subscription;
 
-  constructor(private e: ErrorService) { }
+  constructor(
+    private e: ErrorService,
+    private a: AuthService,
+  ) { }
 
-  ngOnInit() {
-    this.subscription = this.e.error.subscribe(error => { this.errorMessage = error.message; });
+  async ngOnInit() {
+    this.subscription = this.e.error.subscribe(error => {
+      this.errorMessage = error.message;
+    });
+
+    await this.a.initAuth();
   }
 
   ngOnDestroy() {

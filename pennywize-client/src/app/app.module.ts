@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-
+import { OAuthModule } from 'angular-oauth2-oidc';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TransactionsComponent } from './components/transactions/transactions.component';
@@ -20,7 +20,7 @@ registerLocaleData(localeIt);
     AppComponent,
     TransactionComponent,
     TransactionsComponent,
-    EditTransactionComponent,
+    EditTransactionComponent
   ],
   imports: [
     BrowserModule,
@@ -28,9 +28,10 @@ registerLocaleData(localeIt);
     HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    OAuthModule.forRoot()
   ],
-  providers: [{ provide: LOCALE_ID, useValue: 'it' }],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
