@@ -5,15 +5,15 @@
 mat-card.selected::before {
     display: block;
     content: "";
-    width: 6px;
+    width: 4px;
 
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
 
-    border-top-left-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
     
     background-color: greenyellow;
 }

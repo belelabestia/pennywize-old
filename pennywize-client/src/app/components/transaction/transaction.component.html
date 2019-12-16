@@ -1,6 +1,6 @@
 <mat-card [class.selected]="isSelected">
     <div>
-        <div>date: {{transaction.date}}</div>
+        <div>date: {{transaction.date | date: 'shortDate' }}</div>
         <div>amount: {{transaction.amount}}</div>
         <div>type: {{transaction.type}}</div>
         <div>description: {{transaction.description}}</div>
