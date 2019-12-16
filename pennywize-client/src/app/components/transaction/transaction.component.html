@@ -3,6 +3,6 @@
         <div>date: {{transaction.date | date: 'shortDate' }}</div>
         <div>amount: {{transaction.amount}}</div>
         <div>type: {{transaction.type}}</div>
-        <div>description: {{transaction.description}}</div>
+        <div>description: {{transaction.description || '--'}}</div>
     </div>
 </mat-card>

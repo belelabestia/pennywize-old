@@ -14,7 +14,7 @@ export class EditTransactionComponent {
     amount: ['', Validators.required],
     date: ['', Validators.required],
     type: ['', Validators.required],
-    description: ['', Validators.required]
+    description: ['']
   });
 
   @Output() save = new EventEmitter<Transaction>();
