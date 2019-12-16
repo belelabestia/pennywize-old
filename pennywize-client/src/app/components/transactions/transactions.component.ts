@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostBinding } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostBinding, OnDestroy, HostListener } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { ErrorService } from 'src/app/services/error.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-transactions',
@@ -10,9 +11,11 @@ import { ErrorService } from 'src/app/services/error.service';
   styleUrls: ['./transactions.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TransactionsComponent implements OnInit {
+export class TransactionsComponent implements OnInit, OnDestroy {
   @HostBinding('class.mobile') isMobile = false;
-  transactions = this.t.transactions;
+  transactions: Transaction[];
+  subscriptions: Subscription[] = [];
+
   current: Transaction;
   requesting = false;
 
@@ -32,6 +35,13 @@ export class TransactionsComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    const sub = this.t.transactions.subscribe(tt => {
+      this.transactions = tt;
+      this.cd.detectChanges();
+    });
+
+    this.subscriptions.push(sub);
+
     await this.t.get()
       .catch(() => { this.e.dispatch('error loading transactions'); });
 
@@ -40,12 +50,46 @@ export class TransactionsComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => { s.unsubscribe(); });
+  }
+
   add() {
     this.current = new Transaction();
   }
 
   edit(transaction: Transaction) {
-    this.current = new Transaction(transaction);
+    this.current = transaction;
+  }
+
+  cancel() {
+    this.current = null;
+  }
+
+  @HostListener('window:keyup.arrowup')
+  editPrev() {
+    if (!this.transactions) {
+      return;
+    }
+
+    const index = this.transactions.indexOf(this.current);
+
+    if (index - 1 >= 0) {
+      this.current = this.transactions[index - 1];
+    }
+  }
+
+  @HostListener('window:keyup.arrowdown')
+  editNext() {
+    if (!this.transactions) {
+      return;
+    }
+
+    const index = this.transactions.indexOf(this.current);
+
+    if (index + 1 < this.transactions.length) {
+      this.current = this.transactions[index + 1];
+    }
   }
 
   async save(t: Transaction) {
@@ -60,10 +104,6 @@ export class TransactionsComponent implements OnInit {
         this.cd.markForCheck();
         this.requesting = false;
       });
-  }
-
-  cancel() {
-    this.current = null;
   }
 
   async delete() {

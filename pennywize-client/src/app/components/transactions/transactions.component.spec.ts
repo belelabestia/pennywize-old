@@ -73,9 +73,8 @@ describe('TransactionsComponent', () => {
     ]);
 
     const stable = fixture.whenStable();
-    const received = component.transactions.pipe(first()).toPromise();
 
-    await expectAsync(Promise.all([stable, received])).toBeResolved();
+    await expectAsync(stable).toBeResolved();
 
     fixture.detectChanges();
 

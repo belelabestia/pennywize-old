@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -10,7 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class EditTransactionComponent {
   form = this.fb.group({
-    id: [''],
+    id: [undefined],
     amount: ['', Validators.required],
     date: ['', Validators.required],
     type: ['', Validators.required],
@@ -49,12 +49,16 @@ export class EditTransactionComponent {
     }
   }
 
+  @HostListener('window:keyup.esc')
   emitCancel() {
     this.cancel.emit();
   }
 
+  @HostListener('window:keyup.delete')
   emitDelete() {
-    this.delete.emit();
+    if (this.transaction.id) {
+      this.delete.emit();
+    }
   }
 
   private updateForm(transaction: Transaction, disabled: boolean) {

@@ -1,3 +1,16 @@
 :host {
     display: block;
 }
+
+mat-card {
+    display: flex;
+}
+
+mat-card.selected::before {
+    display: block;
+    content: "";
+    width: 6px;
+    margin-left: -16px;
+    margin-right: 15px;
+    background-color: greenyellow;
+}

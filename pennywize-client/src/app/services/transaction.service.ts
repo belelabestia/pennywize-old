@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { Transaction } from '../models/transaction';
-import { map, switchMap, switchMapTo, mapTo } from 'rxjs/operators';
 
 const url = 'api/transactions';
 

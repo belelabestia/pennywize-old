@@ -8,7 +8,9 @@ import { Transaction } from 'src/app/models/transaction';
 })
 export class TransactionComponent {
   @Input() transaction: Transaction;
+  @Input() isSelected = false;
   @Output() selected = new EventEmitter<void>();
+
 
   @HostListener('click') emitSelected() {
     this.selected.emit();
