@@ -66,8 +66,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.current = null;
   }
 
-  @HostListener('window:keyup.arrowup')
-  editPrev() {
+  @HostListener('window:keydown.arrowup', ['$event'])
+  editPrev(event: KeyboardEvent) {
+    event.preventDefault();
     if (!this.transactions) {
       return;
     }
@@ -79,8 +80,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('window:keyup.arrowdown')
-  editNext() {
+  @HostListener('window:keydown.arrowdown', ['$event'])
+  editNext(event: KeyboardEvent) {
+    event.preventDefault();
     if (!this.transactions) {
       return;
     }

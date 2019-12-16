@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 
 @Component({
@@ -7,10 +7,28 @@ import { Transaction } from 'src/app/models/transaction';
   styleUrls: ['./transaction.component.css']
 })
 export class TransactionComponent {
+  private _isSelected = false;
+
   @Input() transaction: Transaction;
-  @Input() isSelected = false;
   @Output() selected = new EventEmitter<void>();
 
+  @Input() set isSelected(s: boolean) {
+    if (s) {
+      this.ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    this._isSelected = s;
+  }
+
+  get isSelected() {
+    return this._isSelected;
+  }
+
+  get ref(): HTMLElement {
+    return this.el.nativeElement as HTMLElement;
+  }
+
+  constructor(private el: ElementRef) { }
 
   @HostListener('click') emitSelected() {
     this.selected.emit();
