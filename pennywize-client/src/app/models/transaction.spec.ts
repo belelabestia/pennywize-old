@@ -6,10 +6,11 @@ describe('Transaction', () => {
   });
 
   it('should create an instance with partial', () => {
-    const partial = {
+    const partial: any = {
       id: '0u9gu0g4er3',
       amount: 2305,
-      description: '53082rhfe'
+      description: '53082rhfe',
+      date: '2019-12-14T23:00:00Z'
     };
 
     const transaction = new Transaction(partial);
@@ -19,7 +20,8 @@ describe('Transaction', () => {
     expect(
       transaction.id == partial.id &&
       transaction.amount == partial.amount &&
-      transaction.description == partial.description
+      transaction.description == partial.description &&
+      transaction.date.getTime() == new Date(partial.date).getTime()
     ).toBeTruthy();
   });
 });
