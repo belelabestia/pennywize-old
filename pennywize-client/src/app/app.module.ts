@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, LOCALE_ID } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { AppRoutingModule } from './app-routing.module';
@@ -12,6 +12,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
+import { idTokenInterceptorProviders } from './auth/id-token-interceptor';
 
 registerLocaleData(localeIt);
 
@@ -31,7 +32,9 @@ registerLocaleData(localeIt);
     MaterialModule,
     OAuthModule.forRoot()
   ],
-  providers: [],
+  providers: [
+    idTokenInterceptorProviders
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,7 +1,14 @@
-<span id="content">
-  <router-outlet></router-outlet>
-</span>
-<dialog [open]="errorMessage">
-  {{errorMessage}}
-  <button (click)="dismissError()">Ok</button>
-</dialog>
+
+<ng-container *ngIf="logged; else logging">
+  <span id="content">
+    <router-outlet></router-outlet>
+  </span>
+  <dialog [open]="errorMessage">
+    {{errorMessage}}
+    <button (click)="dismissError()">Ok</button>
+  </dialog>
+</ng-container>
+
+<ng-template #logging>
+  Logging...
+</ng-template>
