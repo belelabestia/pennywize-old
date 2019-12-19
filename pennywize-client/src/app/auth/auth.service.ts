@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { DiscoveryDocument, TokenResponse } from './interfaces';
+import { authConf } from './auth.conf';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  readonly issuer = 'https://accounts.google.com';
-  readonly responseType = 'code';
-  readonly clientId = '748180026787-gnbgs0f358t6qq5v9ph8aanovq39pkee.apps.googleusercontent.com';
-  readonly redirectUri = location.origin;
-  readonly scope = 'openid profile email';
-  readonly clientSecret = 'cu8MxCD_1XrTSNucofF26_gQ';
+  readonly issuer = authConf.issuer;
+  readonly responseType = authConf.responseType;
+  readonly clientId = authConf.clientId;
+  readonly redirectUri = authConf.redirectUri;
+  readonly scope = authConf.scope;
+  readonly clientSecret = authConf.clientSecret;
 
   discoveryDocument: DiscoveryDocument;
   tokenResponse: TokenResponse;

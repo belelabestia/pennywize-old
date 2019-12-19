@@ -44,3 +44,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Auth Conf File
+/src/app/auth/auth.conf.ts
