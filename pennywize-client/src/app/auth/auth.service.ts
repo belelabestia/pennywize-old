@@ -21,13 +21,15 @@ export class AuthService {
 
   async auth() {
     const urlParams = new HttpParams({ fromString: location.search.slice(1) });
+    history.replaceState({}, '', '');
+
     const authorizationCode = urlParams.get('code');
 
-    if (!authorizationCode) {
-      await this.requestAuthorizationCode();
-    } else {
-      await this.requestToken(authorizationCode);
-    }
+    const operation = authorizationCode ?
+      () => this.validateStateAndRequestToken(urlParams) :
+      () => this.requestAuthorizationCode();
+
+    await operation();
   }
 
   async getDiscoveryDocument() {
@@ -42,23 +44,34 @@ export class AuthService {
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
 
+    const state = this.generateStateParameter();
+    localStorage.setItem('state', state);
+
     const authorizationParams = new HttpParams({
       fromObject: {
         response_type: this.responseType,
         client_id: this.clientId,
         redirect_uri: this.redirectUri,
-        scope: this.scope
+        scope: this.scope,
+        state
       }
     });
 
     location.href = `${authorizationEndpoint}?${authorizationParams.toString()}`;
   }
 
-  async requestToken(authorizationCode: string) {
-    history.replaceState({}, '', '');
+  async validateStateAndRequestToken(urlParams: HttpParams) {
+    const urlState = urlParams.get('state');
+    const storedState = localStorage.getItem('state');
+
+    if (urlState != storedState) {
+      throw new Error('OAuth state parameter doesn\'t match');
+    }
 
     const discoveryDocument = await this.getDiscoveryDocument();
     const tokenEndpoint = discoveryDocument.token_endpoint;
+
+    const authorizationCode = urlParams.get('code');
 
     const postData = new FormData();
     postData.append('grant_type', 'authorization_code');
@@ -81,10 +94,20 @@ export class AuthService {
 
     return await this.http.get(userInfoEndpoint, { headers }).toPromise();
   }
+
+  private generateStateParameter(): string {
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const byteArray = new Uint8Array(128);
+
+    crypto.getRandomValues(byteArray);
+
+    const someArray = byteArray.map(b => chars.charCodeAt(b % chars.length));
+
+    return String.fromCharCode(...someArray);
+  }
 }
 
 /*
-- Usare il token in un interceptor
+- implementare PKCE
 - Salvare/recuperare il token in/da localStorage
-- Gestire parametro State
 */
