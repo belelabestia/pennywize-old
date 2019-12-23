@@ -52,8 +52,6 @@ export class AuthService {
 
     const challenge = await this.generateChallenge(verifier);
 
-    console.log({ verifier, challenge });
-
     const authorizationParams = new HttpParams({
       fromObject: {
         response_type: this.responseType,
@@ -73,10 +71,6 @@ export class AuthService {
     const urlState = urlParams.get('state');
     const storedState = localStorage.getItem('state');
     const storedVerifier = localStorage.getItem('code_verifier');
-
-    const challenge = await this.generateChallenge(storedVerifier);
-
-    console.log({ storedVerifier, challenge });
 
     if (urlState != storedState) {
       throw new Error('OAuth state parameter doesn\'t match');
