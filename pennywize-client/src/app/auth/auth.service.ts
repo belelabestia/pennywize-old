@@ -44,8 +44,15 @@ export class AuthService {
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
 
-    const state = this.generateStateParameter();
+    const state = this.generateRandomString();
     localStorage.setItem('state', state);
+
+    const verifier = this.generateRandomString();
+    localStorage.setItem('code_verifier', verifier);
+
+    const challenge = await this.generateChallenge(verifier);
+
+    console.log({ verifier, challenge });
 
     const authorizationParams = new HttpParams({
       fromObject: {
@@ -53,7 +60,9 @@ export class AuthService {
         client_id: this.clientId,
         redirect_uri: this.redirectUri,
         scope: this.scope,
-        state
+        state,
+        code_challenge: challenge,
+        code_challenge_method: 'S256'
       }
     });
 
@@ -63,6 +72,11 @@ export class AuthService {
   async validateStateAndRequestToken(urlParams: HttpParams) {
     const urlState = urlParams.get('state');
     const storedState = localStorage.getItem('state');
+    const storedVerifier = localStorage.getItem('code_verifier');
+
+    const challenge = await this.generateChallenge(storedVerifier);
+
+    console.log({ storedVerifier, challenge });
 
     if (urlState != storedState) {
       throw new Error('OAuth state parameter doesn\'t match');
@@ -79,6 +93,7 @@ export class AuthService {
     postData.append('redirect_uri', this.redirectUri);
     postData.append('client_id', this.clientId);
     postData.append('client_secret', this.clientSecret);
+    postData.append('code_verifier', storedVerifier);
 
     this.tokenResponse = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
   }
@@ -95,7 +110,7 @@ export class AuthService {
     return await this.http.get(userInfoEndpoint, { headers }).toPromise();
   }
 
-  private generateStateParameter(): string {
+  private generateRandomString(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const byteArray = new Uint8Array(128);
 
@@ -105,9 +120,24 @@ export class AuthService {
 
     return String.fromCharCode(...someArray);
   }
+
+  private async generateChallenge(code: string): Promise<string> {
+    let data: any = new TextEncoder().encode(code);
+
+    data = await crypto.subtle.digest('SHA-256', data);
+    data = new Uint8Array(data);
+    data = String.fromCharCode(...data);
+
+    data = btoa(data)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    return data;
+  }
 }
 
 /*
-- implementare PKCE
 - Salvare/recuperare il token in/da localStorage
+- Refresh token
 */

@@ -18,7 +18,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private e: ErrorService,
-    private a: AuthService,
+    private a: AuthService
   ) { }
 
   async ngOnInit() {
