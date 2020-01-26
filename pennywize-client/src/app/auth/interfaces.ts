@@ -1,3 +1,12 @@
+export interface AuthConf {
+  issuer: string;
+  responseType: string;
+  clientId: string;
+  redirectUri: string;
+  scope: string;
+  clientSecret: string;
+}
+
 export interface DiscoveryDocument {
   authorization_endpoint: string;
   token_endpoint: string;

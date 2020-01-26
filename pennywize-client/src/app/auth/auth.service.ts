@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { DiscoveryDocument, TokenResponse } from './interfaces';
-import { authConf } from './auth.conf';
+import { DiscoveryDocument, TokenResponse, AuthConf } from './interfaces';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  readonly issuer = authConf.issuer;
-  readonly responseType = authConf.responseType;
-  readonly clientId = authConf.clientId;
-  readonly redirectUri = authConf.redirectUri;
-  readonly scope = authConf.scope;
-  readonly clientSecret = authConf.clientSecret;
-
+  authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
   tokenResponse: TokenResponse;
 
@@ -34,7 +27,9 @@ export class AuthService {
 
   async getDiscoveryDocument() {
     if (!this.discoveryDocument) {
-      this.discoveryDocument = await this.http.get<DiscoveryDocument>(`${this.issuer}/.well-known/openid-configuration`).toPromise();
+      this.discoveryDocument = await this.http
+        .get<DiscoveryDocument>(`${this.authConf.issuer}/.well-known/openid-configuration`)
+        .toPromise();
     }
 
     return this.discoveryDocument;
@@ -54,10 +49,10 @@ export class AuthService {
 
     const authorizationParams = new HttpParams({
       fromObject: {
-        response_type: this.responseType,
-        client_id: this.clientId,
-        redirect_uri: this.redirectUri,
-        scope: this.scope,
+        response_type: this.authConf.responseType,
+        client_id: this.authConf.clientId,
+        redirect_uri: this.authConf.redirectUri,
+        scope: this.authConf.scope,
         state,
         code_challenge: challenge,
         code_challenge_method: 'S256'
@@ -84,9 +79,9 @@ export class AuthService {
     const postData = new FormData();
     postData.append('grant_type', 'authorization_code');
     postData.append('code', authorizationCode);
-    postData.append('redirect_uri', this.redirectUri);
-    postData.append('client_id', this.clientId);
-    postData.append('client_secret', this.clientSecret);
+    postData.append('redirect_uri', this.authConf.redirectUri);
+    postData.append('client_id', this.authConf.clientId);
+    postData.append('client_secret', this.authConf.clientSecret);
     postData.append('code_verifier', storedVerifier);
 
     this.tokenResponse = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
