@@ -9,7 +9,14 @@ import { AuthConfMissingError } from './auth-conf-missing-error';
 export class AuthService {
   authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
-  tokenResponse: TokenResponse;
+
+  get tokenResponse() {
+    return JSON.parse(localStorage.getItem('tokenResponse'));
+  }
+
+  set tokenResponse(tr: TokenResponse) {
+    localStorage.setItem('tokenResponse', JSON.stringify(tr));
+  }
 
   constructor(private http: HttpClient) { }
 
