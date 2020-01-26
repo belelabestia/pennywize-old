@@ -12,6 +12,10 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  configure(conf: AuthConf) {
+    this.authConf = conf;
+  }
+
   async auth() {
     const urlParams = new HttpParams({ fromString: location.search.slice(1) });
     history.replaceState({}, '', '');
