@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { DiscoveryDocument, TokenResponse, AuthConf } from './interfaces';
+import { AuthConfMissingError } from './auth-conf-missing-error';
 
 @Injectable({
   providedIn: 'root'
@@ -30,6 +31,10 @@ export class AuthService {
   }
 
   async getDiscoveryDocument() {
+    if (!this.authConf) {
+      throw new AuthConfMissingError();
+    }
+
     if (!this.discoveryDocument) {
       this.discoveryDocument = await this.http
         .get<DiscoveryDocument>(`${this.authConf.issuer}/.well-known/openid-configuration`)
@@ -40,6 +45,10 @@ export class AuthService {
   }
 
   async requestAuthorizationCode() {
+    if (!this.authConf) {
+      throw new AuthConfMissingError();
+    }
+
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
 
@@ -67,6 +76,10 @@ export class AuthService {
   }
 
   async validateStateAndRequestToken(urlParams: HttpParams) {
+    if (!this.authConf) {
+      throw new AuthConfMissingError();
+    }
+
     const urlState = urlParams.get('state');
     const storedState = localStorage.getItem('state');
     const storedVerifier = localStorage.getItem('code_verifier');
