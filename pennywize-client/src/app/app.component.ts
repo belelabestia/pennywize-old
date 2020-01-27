@@ -14,7 +14,7 @@ export class AppComponent implements OnInit, OnDestroy {
   subscription: Subscription;
 
   get logged() {
-    return !!this.a.tokenResponse;
+    return !!this.a.tokenData;
   }
 
   constructor(
@@ -39,5 +39,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   dismissError() {
     this.errorMessage = null;
+  }
+
+  refresh() {
+    this.a.refreshToken();
   }
 }

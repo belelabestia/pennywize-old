@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { DiscoveryDocument, TokenResponse, AuthConf } from './interfaces';
+import { DiscoveryDocument, TokenResponse as TokenData, AuthConf } from './interfaces';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
 const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
@@ -12,12 +12,12 @@ export class AuthService {
   authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
 
-  get tokenResponse() {
-    return JSON.parse(localStorage.getItem('tokenResponse'));
+  get tokenData() {
+    return JSON.parse(localStorage.getItem('tokenData'));
   }
 
-  set tokenResponse(tr: TokenResponse) {
-    localStorage.setItem('tokenResponse', JSON.stringify(tr));
+  set tokenData(tr: TokenData) {
+    localStorage.setItem('tokenData', JSON.stringify(tr));
   }
 
   constructor(private http: HttpClient) { }
@@ -77,7 +77,9 @@ export class AuthService {
         scope: this.authConf.scope,
         state,
         code_challenge: challenge,
-        code_challenge_method: 'S256'
+        code_challenge_method: 'S256',
+        access_type: 'offline',
+        prompt: 'consent'
       }
     });
 
@@ -110,19 +112,36 @@ export class AuthService {
     postData.append('client_secret', this.authConf.clientSecret);
     postData.append('code_verifier', storedVerifier);
 
-    this.tokenResponse = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
+    this.tokenData = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
   }
 
   async getUserInfo() {
     const discoveryDocument = await this.getDiscoveryDocument();
     const userInfoEndpoint = discoveryDocument.userinfo_endpoint;
-    const accessToken = this.tokenResponse.access_token;
+    const accessToken = this.tokenData.access_token;
 
     const headers = new HttpHeaders({
       Authorization: `Bearer ${accessToken}`
     });
 
     return await this.http.get(userInfoEndpoint, { headers }).toPromise();
+  }
+
+  async refreshToken() {
+    const discoveryDocument = await this.getDiscoveryDocument();
+    const tokenEndpoint = discoveryDocument.token_endpoint;
+
+    const postData = new FormData();
+    postData.append('grant_type', 'refresh_token');
+    postData.append('client_id', this.authConf.clientId);
+    postData.append('client_secret', this.authConf.clientSecret);
+    postData.append('refresh_token', this.tokenData.refresh_token);
+    postData.append('scope', this.authConf.scope);
+
+    const tokenData = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
+    tokenData.refresh_token = this.tokenData.refresh_token;
+
+    this.tokenData = tokenData;
   }
 
   private generateRandomString(): string {
