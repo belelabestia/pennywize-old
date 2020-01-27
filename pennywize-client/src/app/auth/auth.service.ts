@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { DiscoveryDocument, TokenResponse, AuthConf } from './interfaces';
-import { AuthConfMissingError } from './auth-conf-missing-error';
+
+const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
+const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
 
 @Injectable({
   providedIn: 'root'
@@ -39,7 +41,7 @@ export class AuthService {
 
   async getDiscoveryDocument() {
     if (!this.authConf) {
-      throw new AuthConfMissingError();
+      throw new Error(authConfErrorMessage);
     }
 
     if (!this.discoveryDocument) {
@@ -53,7 +55,7 @@ export class AuthService {
 
   async requestAuthorizationCode() {
     if (!this.authConf) {
-      throw new AuthConfMissingError();
+      throw new Error(authConfErrorMessage);
     }
 
     const discoveryDocument = await this.getDiscoveryDocument();
@@ -84,7 +86,7 @@ export class AuthService {
 
   async validateStateAndRequestToken(urlParams: HttpParams) {
     if (!this.authConf) {
-      throw new AuthConfMissingError();
+      throw new Error(authConfErrorMessage);
     }
 
     const urlState = urlParams.get('state');
@@ -92,7 +94,7 @@ export class AuthService {
     const storedVerifier = localStorage.getItem('code_verifier');
 
     if (urlState != storedState) {
-      throw new Error('OAuth state parameter doesn\'t match');
+      throw new Error(stateMismatchMessage);
     }
 
     const discoveryDocument = await this.getDiscoveryDocument();
