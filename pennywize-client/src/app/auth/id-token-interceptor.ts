@@ -2,6 +2,7 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HTTP_INTERCEPTORS
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Provider } from '@angular/core';
+import { authConf } from './auth.conf';
 
 export class IdTokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) { }
@@ -9,7 +10,7 @@ export class IdTokenInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const idToken = (this.auth.tokenData || {} as any).id_token;
 
-    const tokenReq = idToken ?
+    const tokenReq = req.url.startsWith(authConf.apiPath) && idToken ?
       req.clone({ setHeaders: { Authorization: `Bearer ${idToken}` } }) :
       req;
 

@@ -5,6 +5,7 @@ export interface AuthConf {
   redirectUri: string;
   scope: string;
   clientSecret: string;
+  apiPath: string;
 }
 
 export interface DiscoveryDocument {
