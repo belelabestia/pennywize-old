@@ -27,6 +27,10 @@ export class AuthService {
   }
 
   async auth() {
+    if (this.tokenData) {
+      return;
+    }
+
     const urlParams = new HttpParams({ fromString: location.search.slice(1) });
     history.replaceState({}, '', '');
 
