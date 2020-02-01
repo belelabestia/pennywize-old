@@ -36,11 +36,11 @@ export class AuthService {
 
     const authorizationCode = urlParams.get('code');
 
-    const operation = authorizationCode ?
-      () => this.validateStateAndRequestToken(urlParams) :
-      () => this.requestAuthorizationCode();
-
-    await operation();
+    if (authorizationCode) {
+      this.validateStateAndRequestToken(urlParams);
+    } else {
+      this.requestAuthorizationCode();
+    }
   }
 
   async getDiscoveryDocument() {
