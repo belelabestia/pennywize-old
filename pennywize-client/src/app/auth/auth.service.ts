@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { DiscoveryDocument, TokenResponse as TokenData, AuthConf } from './interfaces';
+import { DiscoveryDocument, TokenData, AuthConf } from './interfaces';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
 const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
@@ -116,7 +116,10 @@ export class AuthService {
     postData.append('client_secret', this.authConf.clientSecret);
     postData.append('code_verifier', storedVerifier);
 
-    this.tokenData = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
+    const tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
+    tokenData.stored_at = '' + new Date().getTime();
+
+    this.tokenData = tokenData;
   }
 
   async getUserInfo() {
@@ -142,8 +145,9 @@ export class AuthService {
     postData.append('refresh_token', this.tokenData.refresh_token);
     postData.append('scope', this.authConf.scope);
 
-    const tokenData = await this.http.post<any>(`${tokenEndpoint}`, postData).toPromise();
+    const tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
     tokenData.refresh_token = this.tokenData.refresh_token;
+    tokenData.stored_at = '' + new Date().getTime();
 
     this.tokenData = tokenData;
   }
