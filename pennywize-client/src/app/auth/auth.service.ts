@@ -170,8 +170,3 @@ export class AuthService {
     return data;
   }
 }
-
-/*
-- Salvare/recuperare il token in/da localStorage
-- Refresh token
-*/

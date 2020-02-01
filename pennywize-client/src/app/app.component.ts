@@ -40,8 +40,4 @@ export class AppComponent implements OnInit, OnDestroy {
   dismissError() {
     this.errorMessage = null;
   }
-
-  refresh() {
-    this.a.refreshToken();
-  }
 }
