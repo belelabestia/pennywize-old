@@ -159,7 +159,7 @@ export class AuthService {
       throw new Error(authConfErrorMessage);
     }
 
-    if (!this.authConf.refreshAfter || !this.tokenData?.expires_in) {
+    if (!this.authConf.refreshAfter || !(this.tokenData || {} as TokenData).expires_in) {
       return;
     }
 
