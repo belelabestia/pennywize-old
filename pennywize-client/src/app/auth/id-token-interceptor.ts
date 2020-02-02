@@ -8,7 +8,7 @@ export class IdTokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const idToken = (this.auth.tokenData || {} as any).id_token;
+    const idToken = this.auth.tokenData?.id_token;
 
     const tokenReq = req.url.startsWith(authConf.apiPath) && idToken ?
       req.clone({ setHeaders: { Authorization: `Bearer ${idToken}` } }) :

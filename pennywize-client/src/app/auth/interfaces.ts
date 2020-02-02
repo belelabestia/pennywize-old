@@ -6,6 +6,7 @@ export interface AuthConf {
   scope: string;
   clientSecret: string;
   apiPath: string;
+  refreshAfter?: number;
 }
 
 export interface DiscoveryDocument {

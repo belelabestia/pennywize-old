@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf } from './interfaces';
+import { timer } from 'rxjs';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
 const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
@@ -16,8 +17,10 @@ export class AuthService {
     return JSON.parse(localStorage.getItem('tokenData'));
   }
 
-  set tokenData(tr: TokenData) {
-    localStorage.setItem('tokenData', JSON.stringify(tr));
+  set tokenData(td: TokenData) {
+    td = { ...this.tokenData, ...td };
+    td.stored_at = '' + new Date().getTime();
+    localStorage.setItem('tokenData', JSON.stringify(td));
   }
 
   constructor(private http: HttpClient) { }
@@ -27,9 +30,7 @@ export class AuthService {
   }
 
   async auth() {
-    if (this.tokenData) {
-      return;
-    }
+    this.setupTokenRefresh();
 
     const urlParams = new HttpParams({ fromString: location.search.slice(1) });
     history.replaceState({}, '', '');
@@ -116,10 +117,9 @@ export class AuthService {
     postData.append('client_secret', this.authConf.clientSecret);
     postData.append('code_verifier', storedVerifier);
 
-    const tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
-    tokenData.stored_at = '' + new Date().getTime();
+    this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
 
-    this.tokenData = tokenData;
+    this.setupTokenRefresh();
   }
 
   async getUserInfo() {
@@ -135,6 +135,10 @@ export class AuthService {
   }
 
   async refreshToken() {
+    if (!this.tokenData) {
+      return;
+    }
+
     const discoveryDocument = await this.getDiscoveryDocument();
     const tokenEndpoint = discoveryDocument.token_endpoint;
 
@@ -145,11 +149,30 @@ export class AuthService {
     postData.append('refresh_token', this.tokenData.refresh_token);
     postData.append('scope', this.authConf.scope);
 
-    const tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
-    tokenData.refresh_token = this.tokenData.refresh_token;
-    tokenData.stored_at = '' + new Date().getTime();
+    this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
 
-    this.tokenData = tokenData;
+    this.setupTokenRefresh();
+  }
+
+  setupTokenRefresh() {
+    if (!this.authConf) {
+      throw new Error(authConfErrorMessage);
+    }
+
+    if (!this.authConf.refreshAfter || !this.tokenData?.expires_in) {
+      return;
+    }
+
+    const storedAt = +this.tokenData.stored_at;
+    const expiresIn = +this.tokenData.expires_in * 1000;
+    const refreshAfter = expiresIn * +this.authConf.refreshAfter;
+    const refreshAt = storedAt + refreshAfter;
+    const now = new Date().getTime();
+    const refreshIn = refreshAt - now;
+
+    timer(refreshIn).subscribe(async () => {
+      await this.refreshToken();
+    });
   }
 
   private generateRandomString(): string {
