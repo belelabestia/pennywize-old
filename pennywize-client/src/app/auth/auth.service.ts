@@ -152,7 +152,12 @@ export class AuthService {
     postData.append('refresh_token', this.tokenData.refresh_token);
     postData.append('scope', this.authConf.scope);
 
-    this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
+    try {
+      this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
+    } catch {
+      await this.requestAuthorizationCode();
+      return;
+    }
 
     this.setupTokenRefresh();
   }
