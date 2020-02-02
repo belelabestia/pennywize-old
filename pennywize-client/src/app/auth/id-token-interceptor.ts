@@ -5,24 +5,24 @@ import { Provider } from '@angular/core';
 import { authConf } from './auth.conf';
 import { TokenData } from './interfaces';
 
-export class IdTokenInterceptor implements HttpInterceptor {
+export class TokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const idToken = (this.auth.tokenData || {} as TokenData).id_token;
+    const token = (this.auth.tokenData || {} as TokenData).access_token;
 
-    const tokenReq = req.url.startsWith(authConf.apiPath) && idToken ?
-      req.clone({ setHeaders: { Authorization: `Bearer ${idToken}` } }) :
+    const tokenReq = req.url.startsWith(authConf.apiPath) && token ?
+      req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) :
       req;
 
     return next.handle(tokenReq);
   }
 }
 
-export const idTokenInterceptorProviders: Provider[] = [
+export const tokenInterceptorProviders: Provider[] = [
   {
     provide: HTTP_INTERCEPTORS,
-    useClass: IdTokenInterceptor,
+    useClass: TokenInterceptor,
     multi: true,
     deps: [AuthService]
   }

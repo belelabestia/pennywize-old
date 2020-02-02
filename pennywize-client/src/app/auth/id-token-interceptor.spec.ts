@@ -1,7 +1,7 @@
-import { IdTokenInterceptor } from './id-token-interceptor';
+import { TokenInterceptor } from './id-token-interceptor';
 
 describe('IdTokenInterceptor', () => {
   it('should create an instance', () => {
-    expect(new IdTokenInterceptor()).toBeTruthy();
+    expect(new TokenInterceptor()).toBeTruthy();
   });
 });
