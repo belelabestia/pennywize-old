@@ -11,7 +11,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
-import { tokenInterceptorProviders } from './auth/id-token-interceptor';
+import { tokenInterceptorProviders } from './auth/token-interceptor';
 
 registerLocaleData(localeIt);
 
