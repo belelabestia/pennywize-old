@@ -12,10 +12,7 @@ import { authConf } from './auth/auth.conf';
 export class AppComponent implements OnInit, OnDestroy {
   errorMessage: string;
   subscription: Subscription;
-
-  get logged() {
-    return !!this.a.tokenData;
-  }
+  logged = false;
 
   constructor(
     private e: ErrorService,
@@ -26,6 +23,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription = this.e.error.subscribe(error => {
       this.errorMessage = error.message;
     });
+
+    this.a.user.subscribe(u => this.logged = !!u);
 
     this.a.configure(authConf);
     await this.a.auth();

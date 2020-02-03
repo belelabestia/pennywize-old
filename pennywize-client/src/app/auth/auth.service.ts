@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf } from './interfaces';
-import { timer } from 'rxjs';
+import { timer, BehaviorSubject } from 'rxjs';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
 const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
@@ -12,6 +12,8 @@ const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
 export class AuthService {
   authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
+  private userSub = new BehaviorSubject<any>(null);
+  user = this.userSub.asObservable();
 
   get tokenData() {
     return JSON.parse(localStorage.getItem('tokenData'));
@@ -31,7 +33,8 @@ export class AuthService {
 
   async auth() {
     if (this.tokenData) {
-      this.setupTokenRefresh();
+      await this.setupTokenRefresh();
+      this.logUserIn();
       return;
     }
 
@@ -41,9 +44,9 @@ export class AuthService {
     const authorizationCode = urlParams.get('code');
 
     if (authorizationCode) {
-      this.validateStateAndRequestToken(urlParams);
+      await this.validateStateAndRequestToken(urlParams);
     } else {
-      this.requestAuthorizationCode();
+      await this.requestAuthorizationCode();
     }
   }
 
@@ -122,23 +125,22 @@ export class AuthService {
 
     this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
 
-    this.setupTokenRefresh();
+    await this.setupTokenRefresh();
+    this.logUserIn();
   }
 
-  async getUserInfo() {
-    const discoveryDocument = await this.getDiscoveryDocument();
-    const userInfoEndpoint = discoveryDocument.userinfo_endpoint;
-    const accessToken = this.tokenData.access_token;
+  logUserIn() {
+    const tokenData = this.tokenData;
+    if (!tokenData) {
+      return;
+    }
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${accessToken}`
-    });
-
-    return await this.http.get(userInfoEndpoint, { headers }).toPromise();
+    this.userSub.next({ name: 'some user name' });
   }
 
   async refreshToken() {
-    if (!this.tokenData) {
+    const tokenData = this.tokenData;
+    if (!tokenData) {
       return;
     }
 
@@ -149,7 +151,7 @@ export class AuthService {
     postData.append('grant_type', 'refresh_token');
     postData.append('client_id', this.authConf.clientId);
     postData.append('client_secret', this.authConf.clientSecret);
-    postData.append('refresh_token', this.tokenData.refresh_token);
+    postData.append('refresh_token', tokenData.refresh_token);
     postData.append('scope', this.authConf.scope);
 
     try {
@@ -159,24 +161,31 @@ export class AuthService {
       return;
     }
 
-    this.setupTokenRefresh();
+    await this.setupTokenRefresh();
   }
 
-  setupTokenRefresh() {
+  async setupTokenRefresh() {
     if (!this.authConf) {
       throw new Error(authConfErrorMessage);
     }
 
-    if (!this.authConf.refreshAfter || !(this.tokenData || {} as TokenData).expires_in) {
+    const tokenData = this.tokenData;
+
+    if (!this.authConf.refreshAfter || !(tokenData || {} as TokenData).expires_in) {
       return;
     }
 
-    const storedAt = +this.tokenData.stored_at;
-    const expiresIn = +this.tokenData.expires_in * 1000;
+    const storedAt = +tokenData.stored_at;
+    const expiresIn = +tokenData.expires_in * 1000;
     const refreshAfter = expiresIn * +this.authConf.refreshAfter;
     const refreshAt = storedAt + refreshAfter;
     const now = new Date().getTime();
     const refreshIn = refreshAt - now;
+
+    if (refreshIn <= 0) {
+      await this.refreshToken();
+      return;
+    }
 
     timer(refreshIn).subscribe(async () => {
       await this.refreshToken();
