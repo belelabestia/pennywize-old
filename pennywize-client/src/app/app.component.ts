@@ -24,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
       this.errorMessage = error.message;
     });
 
-    this.a.user.subscribe(u => this.logged = !!u);
+    this.a.idClaims.subscribe(u => this.logged = !!u);
 
     this.a.configure(authConf);
     await this.a.auth();

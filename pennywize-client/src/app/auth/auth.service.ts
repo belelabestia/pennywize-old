@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
-import { DiscoveryDocument, TokenData, AuthConf } from './interfaces';
+import { DiscoveryDocument, TokenData, AuthConf, IdClaims } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
@@ -12,8 +12,8 @@ const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
 export class AuthService {
   authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
-  private userSub = new BehaviorSubject<any>(null);
-  user = this.userSub.asObservable();
+  private idClaimsSub = new BehaviorSubject<IdClaims>(null);
+  idClaims = this.idClaimsSub.asObservable();
 
   get tokenData() {
     return JSON.parse(localStorage.getItem('tokenData'));
@@ -131,11 +131,20 @@ export class AuthService {
 
   logUserIn() {
     const tokenData = this.tokenData;
-    if (!tokenData) {
+    if (!tokenData || !tokenData.id_token) {
       return;
     }
 
-    this.userSub.next({ name: 'some user name' });
+    let payload: string | IdClaims = tokenData.id_token.split('.')[1];
+
+    if (!payload) {
+      throw new Error('Invalid id token payload');
+    }
+
+    payload = atob(payload);
+    payload = JSON.parse(payload) as IdClaims;
+
+    this.idClaimsSub.next(payload);
   }
 
   async refreshToken() {
