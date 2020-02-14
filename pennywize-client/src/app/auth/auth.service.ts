@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf, IdClaims } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
 
@@ -15,8 +15,8 @@ export class AuthService {
   private idClaimsSub = new BehaviorSubject<IdClaims>(null);
   idClaims = this.idClaimsSub.asObservable();
 
-  get tokenData() {
-    return JSON.parse(localStorage.getItem('tokenData'));
+  get tokenData(): TokenData {
+    return JSON.parse(localStorage.getItem('tokenData')) as TokenData;
   }
 
   set tokenData(td: TokenData) {
@@ -27,11 +27,11 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
-  configure(conf: AuthConf) {
+  configure(conf: AuthConf): void {
     this.authConf = conf;
   }
 
-  async auth() {
+  async auth(): Promise<void> {
     if (this.tokenData) {
       await this.setupTokenRefresh();
       this.logUserIn();
@@ -50,7 +50,7 @@ export class AuthService {
     }
   }
 
-  async getDiscoveryDocument() {
+  async getDiscoveryDocument(): Promise<DiscoveryDocument> {
     if (!this.authConf) {
       throw new Error(authConfErrorMessage);
     }
@@ -64,7 +64,7 @@ export class AuthService {
     return this.discoveryDocument;
   }
 
-  async requestAuthorizationCode() {
+  async requestAuthorizationCode(): Promise<void> {
     if (!this.authConf) {
       throw new Error(authConfErrorMessage);
     }
@@ -97,7 +97,7 @@ export class AuthService {
     location.href = `${authorizationEndpoint}?${authorizationParams.toString()}`;
   }
 
-  async validateStateAndRequestToken(urlParams: HttpParams) {
+  async validateStateAndRequestToken(urlParams: HttpParams): Promise<void> {
     if (!this.authConf) {
       throw new Error(authConfErrorMessage);
     }
@@ -129,7 +129,7 @@ export class AuthService {
     this.logUserIn();
   }
 
-  logUserIn() {
+  logUserIn(): void {
     const tokenData = this.tokenData;
     if (!tokenData || !tokenData.id_token) {
       return;
@@ -147,7 +147,7 @@ export class AuthService {
     this.idClaimsSub.next(payload);
   }
 
-  async refreshToken() {
+  async refreshToken(): Promise<void> {
     const tokenData = this.tokenData;
     if (!tokenData) {
       return;
@@ -173,7 +173,7 @@ export class AuthService {
     await this.setupTokenRefresh();
   }
 
-  async setupTokenRefresh() {
+  async setupTokenRefresh(): Promise<void> {
     if (!this.authConf) {
       throw new Error(authConfErrorMessage);
     }
@@ -201,7 +201,7 @@ export class AuthService {
     });
   }
 
-  private generateRandomString(): string {
+  generateRandomString(): string {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const byteArray = new Uint8Array(128);
 
@@ -212,7 +212,7 @@ export class AuthService {
     return String.fromCharCode(...someArray);
   }
 
-  private async generateChallenge(code: string): Promise<string> {
+  async generateChallenge(code: string): Promise<string> {
     let data: any = new TextEncoder().encode(code);
 
     data = await crypto.subtle.digest('SHA-256', data);
