@@ -110,6 +110,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   async delete() {
     this.requesting = true;
+
     await this.t.delete(this.current)
       .catch(() => { this.e.dispatch('error deleting transaction'); })
       .finally(() => {
@@ -120,9 +121,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   private async post() {
-    await this.t.post(this.current)
-      .then(() => { this.current = new Transaction(); })
-      .finally(() => { this.current = null; });
+    // await this.t.post(this.current)
+    //   .then(() => { this.current = new Transaction(); })
+    //   .finally(() => { this.current = null; });
   }
 
   private async put() {

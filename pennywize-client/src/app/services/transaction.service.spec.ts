@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { TransactionService } from './transaction.service';
 import { Transaction } from '../models/transaction';
-import { first } from 'rxjs/operators';
+import { first, skip, filter } from 'rxjs/operators';
 
 describe('TransactionService', () => {
   let controller: HttpTestingController;
@@ -51,13 +51,9 @@ describe('TransactionService', () => {
       }),
     ];
 
-    const tt = service.transactions.pipe(first()).toPromise();
-
+    const tt = service.transactions.pipe(skip(1), first()).toPromise();
     const get = service.get();
-
-    const req = controller.expectOne('api/transactions');
-    expect(req.request.method).toBe('GET');
-    req.flush(transactions);
+    controller.expectOne(service.url).flush(transactions);
 
     await expectAsync(Promise.all([get, tt])).toBeResolved();
   });
@@ -71,14 +67,9 @@ describe('TransactionService', () => {
       description: 'dasjifo8hfh8f'
     });
 
-    const tt = service.transactions.pipe(first()).toPromise();
-
-    const post = service.post(transaction)
-      .then(() => {
-        controller.expectOne('api/transactions', 'get').flush([transaction]);
-      });
-
-    controller.expectOne('api/transactions', 'post').flush(transaction);
+    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    const post = service.post(transaction);
+    controller.expectOne(service.url).flush(transaction);
 
     await expectAsync(Promise.all([post, tt])).toBeResolved();
   });
@@ -92,25 +83,95 @@ describe('TransactionService', () => {
       description: 'description'
     });
 
-    const put = service.put(transaction).then(() => {
-      controller.expectOne('api/transactions').flush([transaction]);
+    const post = service.post(transaction);
+    controller.expectOne(service.url).flush(transaction);
+    await post;
+
+    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    const put = service.put(transaction);
+    controller.expectOne(`${service.url}/${transaction.id}`).flush(null);
+
+    await expectAsync(Promise.all([tt, put])).toBeResolved();
+  });
+
+  it('shouldn\' put a transaction if not in collection', async () => {
+    const transaction = new Transaction({
+      id: 'fhtc5ueyc89ny',
+      amount: 843,
+      date: new Date(),
+      type: 'y49w8tgh',
+      description: 'description'
     });
 
-    controller.expectOne('api/transactions/fhtc5ueyc89ny').flush(null);
+    const put = service.put(transaction);
+    controller.expectNone(`${service.url}/${transaction.id}`);
 
-    await expectAsync(put).toBeResolved();
+    await expectAsync(put).toBeRejected();
   });
 
   it('should delete a transaction', async () => {
-    const $delete = service.delete(new Transaction({
-      id: 'u0few8rh0g'
-    }))
-      .then(() => {
-        controller.expectOne('api/transactions').flush([]);
-      });
+    const transaction = new Transaction({
+      id: 'fhtc5ueyc89ny',
+      amount: 843,
+      date: new Date(),
+      type: 'y49w8tgh',
+      description: 'description'
+    });
 
-    controller.expectOne('api/transactions/u0few8rh0g').flush(null);
+    const post = service.post(transaction);
+    controller.expectOne(service.url).flush(transaction);
+    await post;
 
-    await expectAsync($delete).toBeResolved();
+    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    const del = service.delete(transaction);
+    controller.expectOne(`${service.url}/${transaction.id}`).flush(transaction);
+
+    await expectAsync(Promise.all([tt, del])).toBeResolved();
+  });
+
+  it('shouldn\' delete a transaction if not in collection', async () => {
+    const transaction = new Transaction({
+      id: 'fhtc5ueyc89ny',
+      amount: 843,
+      date: new Date(),
+      type: 'y49w8tgh',
+      description: 'description'
+    });
+
+    const del = service.delete(transaction);
+    controller.expectNone(`${service.url}/${transaction.id}`);
+
+    await expectAsync(del).toBeRejected();
+  });
+
+  it('post/put/delete should reject if server throws', async () => {
+    const transaction = new Transaction({
+      id: 'fhtc5ueyc89ny',
+      amount: 843,
+      date: new Date(),
+      type: 'y49w8tgh',
+      description: 'dasjifo8hfh8f'
+    });
+
+    let post = service.post(transaction);
+    controller.expectOne(service.url).error(new ErrorEvent('500'));
+
+    await expectAsync(post).toBeRejected();
+
+    post = service.post(transaction);
+    controller.expectOne(service.url).flush(transaction);
+    await post;
+
+    const put = service.put(transaction);
+    controller.expectOne(`${service.url}/${transaction.id}`).error(new ErrorEvent('500'));
+    await expectAsync(put).toBeRejected();
+
+    post = service.post(transaction);
+    controller.expectOne(service.url).flush(transaction);
+    await post;
+
+    const del = service.delete(transaction);
+    controller.expectOne(`${service.url}/${transaction.id}`).error(new ErrorEvent('500'));
+    await expectAsync(del).toBeRejected();
   });
 });

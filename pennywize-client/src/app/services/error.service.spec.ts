@@ -1,13 +1,11 @@
-import { TestBed } from '@angular/core/testing';
-
 import { ErrorService } from './error.service';
+import { Error } from '../models/error';
 
 describe('ErrorService', () => {
   let service: ErrorService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.get(ErrorService);
+    service = new ErrorService();
   });
 
   it('should be created', () => {
@@ -15,14 +13,12 @@ describe('ErrorService', () => {
   });
 
   it('should dispatch erorr', () => {
-    const spy = jasmine.createSpy('subscriber', error => {
-      expect(error).toBeTruthy();
-      expect(error.message).toBe('ciao');
-    })
-      .and.callThrough();
+    const spy = jasmine.createSpy('subscriber');
+    const error = new Error({ message: 'ciao', data: { prop: 'testprop' } });
 
     service.error.subscribe(spy);
+    service.dispatch(error.message, error.data);
 
-    service.dispatch('ciao');
+    expect(spy.calls.first().args[0]).toEqual(error);
   });
 });

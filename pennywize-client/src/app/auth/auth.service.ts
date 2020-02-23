@@ -94,7 +94,8 @@ export class AuthService {
       }
     });
 
-    location.href = `${authorizationEndpoint}?${authorizationParams.toString()}`;
+    const url = `${authorizationEndpoint}?${authorizationParams.toString()}`;
+    this.navigateTo(url);
   }
 
   async validateStateAndRequestToken(urlParams: HttpParams): Promise<void> {
@@ -225,5 +226,9 @@ export class AuthService {
       .replace(/=+$/, '');
 
     return data;
+  }
+
+  private navigateTo(url: string) {
+    location.href = url;
   }
 }

@@ -18,6 +18,7 @@ describe('TransactionsComponent', () => {
   let controller: HttpTestingController;
   let element: HTMLElement;
   let errorService: ErrorService;
+  const url = 'api/transactions';
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -45,7 +46,6 @@ describe('TransactionsComponent', () => {
     element = fixture.nativeElement;
     controller = TestBed.get(HttpTestingController);
     errorService = TestBed.get(ErrorService);
-    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -53,9 +53,9 @@ describe('TransactionsComponent', () => {
   });
 
   it('should show transactions', async () => {
-    const req = controller.expectOne('api/transactions');
+    const init = component.ngOnInit();
 
-    req.flush([
+    controller.expectOne(url).flush([
       new Transaction({
         id: 'hfrhe08rhg09',
         amount: 340,
@@ -72,10 +72,7 @@ describe('TransactionsComponent', () => {
       })
     ]);
 
-    const stable = fixture.whenStable();
-
-    await expectAsync(stable).toBeResolved();
-
+    await expectAsync(init).toBeResolved();
     fixture.detectChanges();
 
     const transactions = element.querySelectorAll('app-transaction');
@@ -83,15 +80,15 @@ describe('TransactionsComponent', () => {
   });
 
   it('should handle fetch error', async () => {
+    const init = component.ngOnInit();
     const err = errorService.error.pipe(first()).toPromise();
-    const stable = fixture.whenStable();
 
-    controller.expectOne('api/transactions').error(new ErrorEvent('test error'));
-
-    await expectAsync(Promise.all([err, stable])).toBeResolved();
+    controller.expectOne(url).error(new ErrorEvent('test error'));
+    await expectAsync(Promise.all([err, init])).toBeResolved();
   });
 
   it('should edit when app-transaction emits', async () => {
+    const init = component.ngOnInit();
     const edit = () => element.querySelector('app-edit-transaction');
 
     const transaction = new Transaction({
@@ -102,32 +99,31 @@ describe('TransactionsComponent', () => {
       type: 'fhr9fher'
     });
 
-    await fixture.whenStable();
+    controller.expectOne(url).flush([transaction]);
+    await expectAsync(init).toBeResolved();
 
     expect(edit()).toBeFalsy();
-
     component.edit(transaction);
-
     fixture.detectChanges();
-
     expect(edit()).toBeTruthy();
   });
 
   it('should edit new on add button click', async () => {
+    const init = component.ngOnInit();
     const edit = () => element.querySelector('app-edit-transaction');
 
+    controller.expectOne(url).flush([]);
+    await expectAsync(init).toBeResolved();
+
     expect(edit()).toBeFalsy();
-
-    await fixture.whenStable();
-
     component.add();
-
     fixture.detectChanges();
-
     expect(edit()).toBeTruthy();
   });
 
   it('should empty current transaction when deleted', async () => {
+    const init = component.ngOnInit();
+
     const transaction = new Transaction({
       id: 'f9ewujg',
       amount: 50,
@@ -137,15 +133,11 @@ describe('TransactionsComponent', () => {
     });
 
     controller.expectOne('api/transactions').flush([transaction]);
-
-    await fixture.whenStable();
+    await expectAsync(init).toBeResolved();
 
     component.current = transaction;
-
     const del = component.delete();
-
-    controller.expectOne('api/transactions/f9ewujg').flush(null);
-
+    controller.expectOne('api/transactions/f9ewujg').flush(transaction);
     await expectAsync(del).toBeResolved();
 
     expect(component.current).toBeNull();
