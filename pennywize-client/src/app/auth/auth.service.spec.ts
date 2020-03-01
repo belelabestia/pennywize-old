@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
 import { HttpClientModule } from '@angular/common/http';
+import { authProviders } from './token-interceptor';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -10,6 +11,9 @@ describe('AuthService', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientModule
+      ],
+      providers: [
+        authProviders({})
       ]
     });
 

@@ -5,7 +5,8 @@ import { ErrorService } from './services/error.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './auth/auth.service';
 import { BehaviorSubject } from 'rxjs';
-import { IdClaims, AuthConf } from './auth/interfaces';
+import { IdClaims } from './auth/interfaces';
+import { MaterialModule } from './material.module';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -18,19 +19,16 @@ describe('AppComponent', () => {
 
     authServiceStub = {
       idClaims: idClaimsSub.asObservable(),
-      configure(conf: AuthConf) { },
-      auth() {
-        return new Promise(resolve => {
-          idClaimsSub.next({});
-          resolve();
-        });
+      async auth() {
+        idClaimsSub.next({});
       }
     };
 
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientModule
+        HttpClientModule,
+        MaterialModule
       ],
       declarations: [
         AppComponent
@@ -43,8 +41,6 @@ describe('AppComponent', () => {
     fixture = TestBed.createComponent(AppComponent);
     service = TestBed.get(ErrorService);
     component = fixture.componentInstance;
-
-    fixture.detectChanges();
   });
 
   it('should create the app', () => {
@@ -52,8 +48,18 @@ describe('AppComponent', () => {
   });
 
   it('should receive error', async () => {
+    await component.ngOnInit();
     service.dispatch('test error');
-    await fixture.whenStable();
     expect(component.errorMessage).toBe('test error');
+  });
+
+  it('should try authentication', async () => {
+    spyOn(authServiceStub, 'auth').and.callThrough();
+
+    const init = component.ngOnInit();
+    expect(component.logging).toBe(true);
+
+    await expectAsync(init).toBeResolved();
+    expect(component.logging).toBe(false);
   });
 });

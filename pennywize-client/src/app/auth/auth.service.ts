@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf, IdClaims } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
+import { AUTH_CONF } from './token-interceptor';
 
 const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
 const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
@@ -10,7 +11,6 @@ const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
   providedIn: 'root'
 })
 export class AuthService {
-  authConf: AuthConf;
   discoveryDocument: DiscoveryDocument;
   private idClaimsSub = new BehaviorSubject<IdClaims>(null);
   idClaims = this.idClaimsSub.asObservable();
@@ -25,11 +25,10 @@ export class AuthService {
     localStorage.setItem('tokenData', JSON.stringify(td));
   }
 
-  constructor(private http: HttpClient) { }
-
-  configure(conf: AuthConf): void {
-    this.authConf = conf;
-  }
+  constructor(
+    private http: HttpClient,
+    @Inject(AUTH_CONF) private authConf: AuthConf
+  ) { }
 
   async auth(): Promise<void> {
     if (this.tokenData) {

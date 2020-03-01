@@ -121,9 +121,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   private async post() {
-    // await this.t.post(this.current)
-    //   .then(() => { this.current = new Transaction(); })
-    //   .finally(() => { this.current = null; });
+    await this.t.post(this.current);
   }
 
   private async put() {

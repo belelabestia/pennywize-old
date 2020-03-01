@@ -8,7 +8,8 @@ import {
   MatDatepickerModule,
   MatNativeDateModule,
   MatFormFieldModule,
-  MAT_DATE_LOCALE
+  MAT_DATE_LOCALE,
+  MatProgressSpinnerModule
 } from '@angular/material';
 
 const modules = [
@@ -18,14 +19,15 @@ const modules = [
   MatInputModule,
   MatDatepickerModule,
   MatNativeDateModule,
-  MatFormFieldModule
+  MatFormFieldModule,
+  MatProgressSpinnerModule
 ];
 
 @NgModule({
   imports: modules,
   exports: modules,
   providers: [
-    { provide: MAT_DATE_LOCALE, useValue: 'it-IT'}
+    { provide: MAT_DATE_LOCALE, useValue: 'it-IT' }
   ]
 })
 export class MaterialModule { }

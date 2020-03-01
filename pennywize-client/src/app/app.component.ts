@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ErrorService } from './services/error.service';
 import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
-import { authConf } from './auth/auth.conf';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +11,7 @@ import { authConf } from './auth/auth.conf';
 export class AppComponent implements OnInit, OnDestroy {
   errorMessage: string;
   subscription: Subscription;
-  logged = false;
+  logging: boolean;
 
   constructor(
     private e: ErrorService,
@@ -24,10 +23,9 @@ export class AppComponent implements OnInit, OnDestroy {
       this.errorMessage = error.message;
     });
 
-    this.a.idClaims.subscribe(u => this.logged = !!u);
-
-    this.a.configure(authConf);
+    this.logging = true;
     await this.a.auth();
+    this.logging = false;
   }
 
   ngOnDestroy() {

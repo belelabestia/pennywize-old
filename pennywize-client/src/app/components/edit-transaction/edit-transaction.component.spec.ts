@@ -72,4 +72,56 @@ describe('EditTransactionComponent', () => {
 
     expect(save).toHaveBeenCalled();
   });
+
+  it('should update form when transaction changes', () => {
+    component.transaction = new Transaction({
+      id: 'f94wy8vycr4dw3',
+      amount: 50,
+      date: new Date('2020-04-02'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    fixture.detectChanges();
+
+    expect(component.form.value.id).toBe('f94wy8vycr4dw3');
+    expect(component.form.value.amount).toBe(50);
+    expect(component.form.value.date.getTime()).toBe(new Date('2020-04-02').getTime());
+    expect(component.form.value.description).toBe('some desc');
+    expect(component.form.value.type).toBe('some type');
+
+    component.transaction = new Transaction({
+      id: 'ouguogouguogug',
+      amount: 60,
+      date: new Date('2019-05-03'),
+      description: 'some other desc',
+      type: 'some other type'
+    });
+
+    fixture.detectChanges();
+
+    expect(component.form.value.id).toBe('ouguogouguogug');
+    expect(component.form.value.amount).toBe(60);
+    expect(component.form.value.date.getTime()).toBe(new Date('2019-05-03').getTime());
+    expect(component.form.value.description).toBe('some other desc');
+    expect(component.form.value.type).toBe('some other type');
+  });
+
+  it('should update form when disabled changes', () => {
+    component.transaction = new Transaction({
+      id: 'f94wy8vycr4dw3',
+      amount: 50,
+      date: new Date('2020-04-02'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    component.disabled = true;
+    fixture.detectChanges();
+    expect(component.form.disabled).toBe(true);
+
+    component.disabled = false;
+    fixture.detectChanges();
+    expect(component.form.enabled).toBe(true);
+  });
 });

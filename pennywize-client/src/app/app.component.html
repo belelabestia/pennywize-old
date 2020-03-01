@@ -1,4 +1,6 @@
-<ng-container *ngIf="logged; else logging">
+<mat-spinner *ngIf="logging; else app"></mat-spinner>
+
+<ng-template #app>
   <span id="content">
     <router-outlet></router-outlet>
   </span>
@@ -6,8 +8,4 @@
     {{errorMessage}}
     <button (click)="dismissError()">Ok</button>
   </dialog>
-</ng-container>
-
-<ng-template #logging>
-  Logging...
 </ng-template>

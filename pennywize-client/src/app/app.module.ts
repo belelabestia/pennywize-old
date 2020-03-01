@@ -11,7 +11,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule } from './material.module';
 import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
-import { tokenInterceptorProviders } from './auth/token-interceptor';
+import { authProviders } from './auth/token-interceptor';
+import { authConf } from './auth/auth.conf';
 
 registerLocaleData(localeIt);
 
@@ -31,7 +32,7 @@ registerLocaleData(localeIt);
     MaterialModule
   ],
   providers: [
-    tokenInterceptorProviders
+    authProviders(authConf),
   ],
   bootstrap: [AppComponent]
 })

@@ -3,12 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { Transaction } from '../models/transaction';
 
-
 @Injectable({
   providedIn: 'root'
 })
 export class TransactionService {
-  url = 'api/transactions';
+  readonly url = 'api/transactions';
   private transactionsSub = new BehaviorSubject<Transaction[]>([]);
   transactions = this.transactionsSub.asObservable();
 
@@ -24,11 +23,11 @@ export class TransactionService {
   }
 
   async post(t: Transaction): Promise<void> {
-    let newTran = await this.hc.post<Transaction>(this.url, t).toPromise();
-    newTran = new Transaction(newTran);
+    const newTran = await this.hc.post<Transaction>(this.url, t).toPromise();
+    Object.assign(t, newTran);
 
     const tt = this.transactionsSub.value;
-    tt.push(newTran);
+    tt.push(t);
     this.transactionsSub.next(tt);
   }
 

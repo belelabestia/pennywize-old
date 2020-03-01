@@ -11,6 +11,7 @@ import { first } from 'rxjs/operators';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { MaterialModule } from 'src/app/material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Error } from 'src/app/models/error';
 
 describe('TransactionsComponent', () => {
   let component: TransactionsComponent;
@@ -142,5 +143,143 @@ describe('TransactionsComponent', () => {
 
     expect(component.current).toBeNull();
     expect(component.requesting).toBe(false);
+  });
+
+  it('should save new transaction', async () => {
+    const init = component.ngOnInit();
+    controller.expectOne('api/transactions').flush([]);
+    await expectAsync(init).toBeResolved();
+
+    expect(component.current).toBeFalsy();
+
+    const transaction = new Transaction();
+    const save = component.save(transaction);
+
+    expect(component.requesting).toBe(true);
+    expect(component.current).toBe(transaction);
+
+    controller.expectOne(req =>
+      req.url == 'api/transactions' &&
+      req.method == 'POST'
+    ).flush(transaction);
+
+    await expectAsync(save).toBeResolved();
+
+    expect(component.requesting).toBe(false);
+    expect(component.current).toBe(transaction);
+    expect(component.transactions).toContain(transaction);
+  });
+
+  it('should save existing transaction', async () => {
+    let transaction = new Transaction({
+      id: 'ouifeysh9otgsh',
+      amount: 50,
+      date: new Date('2020-05-05'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    const init = component.ngOnInit();
+    controller.expectOne('api/transactions').flush([transaction]);
+    await expectAsync(init).toBeResolved();
+
+    transaction = new Transaction(transaction);
+    transaction.amount = 60;
+
+    const save = component.save(transaction);
+
+    controller.expectOne(req =>
+      req.url == 'api/transactions/ouifeysh9otgsh' &&
+      req.method == 'PUT'
+    ).flush(null);
+
+    expect(component.requesting).toBe(true);
+    expect(component.current).toBe(transaction);
+
+    await expectAsync(save).toBeResolved();
+
+    expect(component.current).toBe(transaction);
+    expect(component.requesting).toBe(false);
+  });
+
+  it('should delete existing transaction', async () => {
+    const transaction = new Transaction({
+      id: 'ouifeysh9otgsh',
+      amount: 50,
+      date: new Date('2020-05-05'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    const init = component.ngOnInit();
+    controller.expectOne('api/transactions').flush([transaction]);
+    await expectAsync(init).toBeResolved();
+
+    component.current = transaction;
+
+    const del = component.delete();
+
+    expect(component.requesting).toBe(true);
+
+    controller.expectOne(req =>
+      req.url == 'api/transactions/ouifeysh9otgsh' &&
+      req.method == 'DELETE'
+    ).flush(null);
+
+    await expectAsync(del).toBeResolved();
+
+    expect(component.requesting).toBe(false);
+    expect(component.current).toBe(null);
+  });
+
+  it('should handle error when saving', async () => {
+    let transaction = new Transaction({
+      id: 'hew0h0gfw',
+      amount: 50,
+      date: new Date('2020-05-05'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    let errorContent: Error;
+    const error = errorService.error.pipe(first()).toPromise().then(e => errorContent = e);
+
+    const init = component.ngOnInit();
+    controller.expectOne('api/transactions').flush([transaction]);
+    await expectAsync(init).toBeResolved();
+
+    transaction = new Transaction(transaction);
+    transaction.amount = 60;
+
+    const save = component.save(transaction);
+    controller.expectOne('api/transactions/hew0h0gfw').error(new ErrorEvent('whatever'));
+
+    await expectAsync(Promise.all([save, error])).toBeResolved();
+    expect(errorContent.message).toBe('error saving transaction');
+  });
+
+  it('should handle error when deleting', async () => {
+    const transaction = new Transaction({
+      id: 'hew0h0gfw',
+      amount: 50,
+      date: new Date('2020-05-05'),
+      description: 'some desc',
+      type: 'some type'
+    });
+
+    let errorContent: Error;
+    const error = errorService.error.pipe(first()).toPromise().then(e => errorContent = e);
+
+    const init = component.ngOnInit();
+    controller.expectOne('api/transactions').flush([transaction]);
+    await expectAsync(init).toBeResolved();
+
+    component.current = transaction;
+
+    const del = component.delete();
+    controller.expectOne('api/transactions/hew0h0gfw').error(new ErrorEvent('whatever'));
+
+    await expectAsync(Promise.all([del, error])).toBeResolved();
+    expect(errorContent.message).toBe('error deleting transaction');
   });
 });
