@@ -37,16 +37,14 @@ export class AuthService {
       return;
     }
 
-    const urlParams = new HttpParams({ fromString: location.search.slice(1) });
-    history.replaceState({}, '', '');
-
+    const urlParams = this.getUrlParams();
     const authorizationCode = urlParams.get('code');
 
-    if (authorizationCode) {
-      await this.validateStateAndRequestToken(urlParams);
-    } else {
-      await this.requestAuthorizationCode();
-    }
+    const action = authorizationCode ?
+      () => this.validateStateAndRequestToken(urlParams) :
+      () => this.requestAuthorizationCode();
+
+    await action();
   }
 
   async getDiscoveryDocument(): Promise<DiscoveryDocument> {
@@ -186,7 +184,7 @@ export class AuthService {
 
     const storedAt = +tokenData.stored_at;
     const expiresIn = +tokenData.expires_in * 1000;
-    const refreshAfter = expiresIn * +this.authConf.refreshAfter;
+    const refreshAfter = expiresIn * this.authConf.refreshAfter;
     const refreshAt = storedAt + refreshAfter;
     const now = new Date().getTime();
     const refreshIn = refreshAt - now;
@@ -227,7 +225,13 @@ export class AuthService {
     return data;
   }
 
-  private navigateTo(url: string) {
+  navigateTo(url: string): void {
     location.href = url;
+  }
+
+  getUrlParams(): HttpParams {
+    const params = new HttpParams({ fromString: location.search.slice(1) });
+    history.replaceState({}, '', '');
+    return params;
   }
 }
