@@ -55,7 +55,7 @@ export class TransactionService {
 
     await this.hc.delete(`${this.url}/${t.id}`).toPromise();
 
-    tt.splice(tIdx, 0);
+    tt.splice(tIdx, 1);
     this.transactionsSub.next(tt);
   }
 }

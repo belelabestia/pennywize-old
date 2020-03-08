@@ -3,7 +3,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 
 import { TransactionService } from './transaction.service';
 import { Transaction } from '../models/transaction';
-import { first, skip, filter } from 'rxjs/operators';
+import { first, skip, filter, tap } from 'rxjs/operators';
 
 describe('TransactionService', () => {
   let controller: HttpTestingController;
@@ -67,11 +67,17 @@ describe('TransactionService', () => {
       description: 'dasjifo8hfh8f'
     });
 
-    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    let transactions: Transaction[];
+
+    const tt = service.transactions
+      .pipe(skip(1), first(), tap(t => transactions = t))
+      .toPromise();
+
     const post = service.post(transaction);
     controller.expectOne(service.url).flush(transaction);
 
     await expectAsync(Promise.all([post, tt])).toBeResolved();
+    expect(transactions).toContain(transaction);
   });
 
   it('should put a transaction', async () => {
@@ -87,11 +93,17 @@ describe('TransactionService', () => {
     controller.expectOne(service.url).flush(transaction);
     await post;
 
-    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    let transactions: Transaction[];
+
+    const tt = service.transactions
+      .pipe(skip(1), first(), tap(t => transactions = t))
+      .toPromise();
+
     const put = service.put(transaction);
     controller.expectOne(`${service.url}/${transaction.id}`).flush(null);
 
     await expectAsync(Promise.all([tt, put])).toBeResolved();
+    expect(transactions).toContain(transaction);
   });
 
   it('shouldn\' put a transaction if not in collection', async () => {
@@ -122,11 +134,17 @@ describe('TransactionService', () => {
     controller.expectOne(service.url).flush(transaction);
     await post;
 
-    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    let transactions: Transaction[];
+
+    const tt = service.transactions
+      .pipe(skip(1), first(), tap(t => transactions = t))
+      .toPromise();
+
     const del = service.delete(transaction);
     controller.expectOne(`${service.url}/${transaction.id}`).flush(transaction);
 
     await expectAsync(Promise.all([tt, del])).toBeResolved();
+    expect(transactions).not.toContain(transaction);
   });
 
   it('shouldn\' delete a transaction if not in collection', async () => {
