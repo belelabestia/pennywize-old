@@ -1,3 +1,5 @@
+import { InjectionToken } from '@angular/core';
+
 export interface AuthConf {
   issuer?: string;
   responseType?: string;
@@ -69,3 +71,5 @@ export interface AddressClaim {
   postal_code?: string;
   country?: string;
 }
+
+export const AUTH_CONF = new InjectionToken<AuthConf>('auth-conf');

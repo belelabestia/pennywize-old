@@ -1,10 +1,9 @@
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { Provider, Inject, InjectionToken } from '@angular/core';
-import { TokenData, AuthConf } from './interfaces';
+import { Provider, Inject } from '@angular/core';
+import { TokenData, AuthConf, AUTH_CONF } from './interfaces';
 
-export const AUTH_CONF = new InjectionToken<AuthConf>('auth-conf');
 
 export class TokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService, @Inject(AUTH_CONF) private conf: AuthConf) { }
