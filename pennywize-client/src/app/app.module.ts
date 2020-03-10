@@ -13,6 +13,7 @@ import { registerLocaleData } from '@angular/common';
 import localeIt from '@angular/common/locales/it';
 import { authProviders } from './auth/token-interceptor';
 import { authConf } from './auth/auth.conf';
+import { SettingsComponent } from './components/settings/settings.component';
 
 registerLocaleData(localeIt);
 
@@ -21,7 +22,8 @@ registerLocaleData(localeIt);
     AppComponent,
     TransactionComponent,
     TransactionsComponent,
-    EditTransactionComponent
+    EditTransactionComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,

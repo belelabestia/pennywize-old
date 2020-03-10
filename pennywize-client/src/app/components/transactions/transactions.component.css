@@ -16,8 +16,8 @@
     padding: 24px;
 }
 
-app-transaction {
-    margin: 5px 0;
+app-transaction + app-transaction {
+    margin-top: 5px;
 }
 
 #add {
