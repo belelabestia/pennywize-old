@@ -30,3 +30,7 @@ $pennywize-client-theme: mat-light-theme($pennywize-client-primary, $pennywize-c
     border: 1px solid lightgrey;
     box-shadow: none;
 }
+
+body .mat-card-subtitle {
+    margin-bottom: 0;
+}

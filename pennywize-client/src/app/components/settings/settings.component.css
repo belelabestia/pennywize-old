@@ -6,3 +6,24 @@
 mat-card + mat-card {
     margin-top: 5px;
 }
+
+.main-title {
+    margin-left: -16px;
+}
+
+mat-icon {
+    float: left;
+    margin-right: 5px;
+}
+
+#profile {
+    background-color: #ececec;
+}
+
+#profile-pic {
+    background-size: cover;
+}
+
+.red {
+    color: #f44336;
+}
