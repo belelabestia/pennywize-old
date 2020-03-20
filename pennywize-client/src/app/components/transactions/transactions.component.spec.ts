@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TransactionsComponent } from './transactions.component';
-import { TransactionComponent } from '../transaction/transaction.component';
-import { EditTransactionComponent } from '../edit-transaction/edit-transaction.component';
+import { TransactionComponent } from './transaction/transaction.component';
+import { EditTransactionComponent } from './edit-transaction/edit-transaction.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Transaction } from 'src/app/models/transaction';
