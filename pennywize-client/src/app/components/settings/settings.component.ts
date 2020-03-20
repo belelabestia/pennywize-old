@@ -19,7 +19,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   constructor(private a: AuthService) { }
 
   ngOnInit() {
-    this.sub = this.a.idClaims.subscribe(c => { this.claims = c; console.log(c); });
+    this.sub = this.a.idClaims.subscribe(c => { this.claims = c; });
   }
 
   logout() {
