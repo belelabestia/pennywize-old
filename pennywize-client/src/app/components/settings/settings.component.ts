@@ -13,7 +13,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
   sub: Subscription;
 
   get profile() {
-    return { 'background-image': `url(${this.claims.picture})` };
+    return {
+      background: `#0000 url(${this.claims.picture})`,
+      backgroundSize: 'contain'
+    };
   }
 
   constructor(private a: AuthService) { }
