@@ -2,20 +2,21 @@ import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HTTP_INTERCEPTORS
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Provider, Inject } from '@angular/core';
-import { TokenData, AuthConf, AUTH_CONF } from './interfaces';
+import { AuthConf, AUTH_CONF } from './interfaces';
+import { switchMap, first } from 'rxjs/operators';
 
 
 export class TokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService, @Inject(AUTH_CONF) private conf: AuthConf) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = (this.auth.tokenData || {} as TokenData).id_token;
+    return this.auth.tokenData.pipe(first(), switchMap(td => {
+      const tokenReq = req.url.startsWith(this.conf.apiPath) && td.id_token ?
+        req.clone({ setHeaders: { Authorization: `Bearer ${td.id_token}` } }) :
+        req;
 
-    const tokenReq = req.url.startsWith(this.conf.apiPath) && token ?
-      req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) :
-      req;
-
-    return next.handle(tokenReq);
+      return next.handle(tokenReq);
+    }));
   }
 }
 

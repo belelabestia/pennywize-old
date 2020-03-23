@@ -2,41 +2,45 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf, IdClaims, AUTH_CONF } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
-
-const authConfErrorMessage = 'Configuration object missing; must call AuthService.configure() method before the AuthService.auth() method.';
-const stateMismatchMessage = 'OAuth state parameter doesn\'t match';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   discoveryDocument: DiscoveryDocument;
-  private idClaimsSub = new BehaviorSubject<IdClaims>(null);
-  idClaims = this.idClaimsSub.asObservable();
+  private tokenDataSub = new BehaviorSubject<TokenData>(null);
 
-  get tokenData(): TokenData {
-    return JSON.parse(localStorage.getItem('tokenData')) as TokenData;
-  }
+  readonly tokenData = this.tokenDataSub
+    .asObservable()
+    .pipe(tap(td => {
+      if (td) {
+        td.stored_at = '' + new Date().getTime();
+      }
+    }));
 
-  set tokenData(td: TokenData) {
-    td = { ...this.tokenData, ...td };
-    td.stored_at = '' + new Date().getTime();
-    localStorage.setItem('tokenData', JSON.stringify(td));
-  }
+  readonly idClaims = this.tokenData.pipe(map(td => this.getIdClaims(td)));
 
   constructor(
     private http: HttpClient,
     @Inject(AUTH_CONF) private authConf: AuthConf
-  ) { }
+  ) {
+    this.tokenData.subscribe(td => {
+      if (td) {
+        this.setStoredTokenData(td);
+        this.setupTokenRefresh();
+      }
+    });
+  }
 
   async auth(): Promise<void> {
-    if (this.tokenData) {
-      await this.setupTokenRefresh();
-      this.logUserIn();
+    const tokenData = this.getStoredTokenData();
+    const urlParams = this.getUrlParams();
+    if (tokenData) {
+      this.tokenDataSub.next(tokenData);
       return;
     }
 
-    const urlParams = this.getUrlParams();
     const authorizationCode = urlParams.get('code');
 
     const action = authorizationCode ?
@@ -47,10 +51,6 @@ export class AuthService {
   }
 
   async getDiscoveryDocument(): Promise<DiscoveryDocument> {
-    if (!this.authConf) {
-      throw new Error(authConfErrorMessage);
-    }
-
     if (!this.discoveryDocument) {
       this.discoveryDocument = await this.http
         .get<DiscoveryDocument>(`${this.authConf.issuer}/.well-known/openid-configuration`)
@@ -61,10 +61,6 @@ export class AuthService {
   }
 
   async requestAuthorizationCode(): Promise<void> {
-    if (!this.authConf) {
-      throw new Error(authConfErrorMessage);
-    }
-
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
 
@@ -95,16 +91,12 @@ export class AuthService {
   }
 
   async validateStateAndRequestToken(urlParams: HttpParams): Promise<void> {
-    if (!this.authConf) {
-      throw new Error(authConfErrorMessage);
-    }
-
     const urlState = urlParams.get('state');
     const storedState = localStorage.getItem('state');
     const storedVerifier = localStorage.getItem('code_verifier');
 
     if (urlState != storedState) {
-      throw new Error(stateMismatchMessage);
+      throw new Error('State parameter doesn\'t match');
     }
 
     const discoveryDocument = await this.getDiscoveryDocument();
@@ -120,16 +112,13 @@ export class AuthService {
     postData.append('client_secret', this.authConf.clientSecret);
     postData.append('code_verifier', storedVerifier);
 
-    this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
-
-    await this.setupTokenRefresh();
-    this.logUserIn();
+    const tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
+    this.tokenDataSub.next(tokenData);
   }
 
-  logUserIn(): void {
-    const tokenData = this.tokenData;
+  getIdClaims(tokenData: TokenData): IdClaims {
     if (!tokenData || !tokenData.id_token) {
-      return;
+      return null;
     }
 
     let payload: string | IdClaims = tokenData.id_token.split('.')[1];
@@ -141,13 +130,27 @@ export class AuthService {
     payload = atob(payload);
     payload = JSON.parse(payload) as IdClaims;
 
-    this.idClaimsSub.next(payload);
+    return payload;
+  }
+
+  getStoredTokenData() {
+    return JSON.parse(localStorage.getItem('tokenData')) as TokenData;
+  }
+
+  setStoredTokenData(td: TokenData) {
+    td = { ...this.getStoredTokenData(), ...td };
+    localStorage.setItem('tokenData', JSON.stringify(td));
+  }
+
+  clearStoredTokenData() {
+    localStorage.removeItem('tokenData');
   }
 
   async refreshToken(): Promise<void> {
-    const tokenData = this.tokenData;
+    let tokenData = this.tokenDataSub.value;
+
     if (!tokenData) {
-      return;
+      throw new Error('Missing tokenData');
     }
 
     const discoveryDocument = await this.getDiscoveryDocument();
@@ -161,24 +164,19 @@ export class AuthService {
     postData.append('scope', this.authConf.scope);
 
     try {
-      this.tokenData = await this.http.post<TokenData>(`${tokenEndpoint}`, postData).toPromise();
+      tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
+      this.tokenDataSub.next(tokenData);
     } catch {
+      this.clearStoredTokenData();
       await this.requestAuthorizationCode();
-      return;
     }
-
-    await this.setupTokenRefresh();
   }
 
   async setupTokenRefresh(): Promise<void> {
-    if (!this.authConf) {
-      throw new Error(authConfErrorMessage);
-    }
-
-    const tokenData = this.tokenData;
+    const tokenData = this.tokenDataSub.value;
 
     if (!this.authConf.refreshAfter || !(tokenData || {} as TokenData).expires_in) {
-      return;
+      throw new Error('Missing refresh data');
     }
 
     const storedAt = +tokenData.stored_at;

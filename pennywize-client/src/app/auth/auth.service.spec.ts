@@ -3,10 +3,10 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { HttpClientModule, HttpParams, HttpClient } from '@angular/common/http';
 import { authProviders } from './token-interceptor';
-import { TokenData, IdClaims } from './interfaces';
+import { TokenData, IdClaims, DiscoveryDocument } from './interfaces';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
-import { filter, first, tap } from 'rxjs/operators';
+import { filter, first, tap, skip } from 'rxjs/operators';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -25,7 +25,8 @@ describe('AuthService', () => {
           clientId: 'clientid',
           clientSecret: 'secret',
           scope: 'email',
-          refreshAfter: 0.01
+          refreshAfter: 0.01,
+          redirectUri: 'uri'
         })
       ]
     });
@@ -33,14 +34,25 @@ describe('AuthService', () => {
     service = TestBed.get(AuthService);
     controller = TestBed.get(HttpTestingController);
     http = TestBed.get(HttpClient);
-    localStorage.removeItem('tokenData');
+    localStorage.clear();
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should save tokenData in localStorage', () => {
+  it('should save tokenData in localStorage', async () => {
+    const state = 'test state';
+
+    localStorage.setItem('state', state);
+    localStorage.setItem('code_verifier', 'test verifier');
+
+    const params = new HttpParams({ fromObject: { state } });
+
+    const discoveryDocument: DiscoveryDocument = { token_endpoint: 'fake-token' };
+    const getDiscoveryDocument = spyOn(service, 'getDiscoveryDocument')
+      .and.returnValue(Promise.resolve(discoveryDocument));
+
     const td: TokenData = {
       access_token: 'efgpispfj',
       id_token: 'fjsdipojfds',
@@ -50,33 +62,17 @@ describe('AuthService', () => {
       token_type: 'token type'
     };
 
-    service.tokenData = td;
-    td.stored_at = service.tokenData.stored_at;
+    const post = spyOn(http, 'post').and.returnValue(of(td));
 
-    const fromStorage = JSON.parse(localStorage.getItem('tokenData'));
+    const request = service.validateStateAndRequestToken(params);
+    await expectAsync(request).toBeResolved();
 
+    expect(getDiscoveryDocument).toHaveBeenCalled();
+    expect(post).toHaveBeenCalled();
+
+    const fromStorage = JSON.parse(localStorage.getItem('tokenData')) as TokenData;
+    td.stored_at = fromStorage.stored_at;
     expect(fromStorage).toEqual(td);
-  });
-
-  it('should log user in', async () => {
-    const td: TokenData = {
-      access_token: 'efgpispfj',
-      id_token: 'fjsdipojfds',
-      expires_in: '200',
-      refresh_token: 'pofjesofjes',
-      scope: 'email profile',
-      token_type: 'token type'
-    };
-
-    const setupTokenRefresh = spyOn(service, 'setupTokenRefresh');
-    const logUserIn = spyOn(service, 'logUserIn');
-
-    service.tokenData = td;
-
-    await service.auth();
-
-    expect(setupTokenRefresh).toHaveBeenCalled();
-    expect(logUserIn).toHaveBeenCalled();
   });
 
   it('should parse and notify id claims', async () => {
@@ -86,35 +82,40 @@ describe('AuthService', () => {
         'SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
     };
 
-    service.tokenData = td;
-
     let claims: IdClaims;
     const claimsPromise = service.idClaims
       .pipe(filter(c => !!c), first(), tap(c => claims = c))
       .toPromise();
 
-    service.logUserIn();
+    const getUrlParams = spyOn(service, 'getUrlParams');
+
+    service.getStoredTokenData = () => td;
+    service.setupTokenRefresh = async () => {};
+    service.auth();
 
     await expectAsync(claimsPromise).toBeResolved();
+
     expect(claims).toEqual({
       sub: '1234567890',
       name: 'John Doe',
       iat: 1516239022
     });
+
+    expect(getUrlParams).toHaveBeenCalled();
   });
 
-  it('should throw if login fails', () => {
-    const td: TokenData = {
-      id_token: 'jsojdodjs'
-    };
+  it('should throw if login fails', async () => {
+    const claims = service.idClaims.toPromise();
 
-    service.tokenData = td;
-    const login = () => service.logUserIn();
-    expect(login).toThrow();
+    service.getStoredTokenData = () => ({ id_token: 'jsojdodjs' });
+    service.setupTokenRefresh = async () => {};
+    service.auth();
+
+    await expectAsync(claims).toBeRejectedWith(new Error('Invalid id token payload'));
   });
 
   it('should request auth code', async () => {
-    const getUrlParams = spyOn(service, 'getUrlParams').and.callFake(() => new HttpParams({ fromString: '' }));
+    const getUrlParams = spyOn(service, 'getUrlParams').and.returnValue(new HttpParams({ fromString: '' }));
     const requestAuthorizationCode = spyOn(service, 'requestAuthorizationCode');
 
     await service.auth();
@@ -135,49 +136,53 @@ describe('AuthService', () => {
   });
 
   it('should get discovery document', async () => {
+    spyOn(http, 'get').and.returnValue(of({}));
+
     const get = service.getDiscoveryDocument();
-
-    controller.expectOne(req =>
-      req.method == 'GET' &&
-      req.url == 'testissuer/.well-known/openid-configuration'
-    ).flush({});
-
     await expectAsync(get).toBeResolved();
     expect(service.discoveryDocument).toBeTruthy();
   });
 
   it('should refresh token', async () => {
-    const getDiscoveryDocument = spyOn(service, 'getDiscoveryDocument')
-      .and.returnValue(Promise.resolve({ token_endpoint: 'endpoint' }));
+    service.getStoredTokenData = () => ({ refresh_token: 'refresh token' });
+    service.setStoredTokenData = () => { };
+    service.getDiscoveryDocument = () => Promise.resolve({ token_endpoint: 'endpoint' });
+    service.setupTokenRefresh = () => Promise.resolve();
+    service.auth();
 
-    const httpPost = spyOn(http, 'post').and.returnValue(of({}));
-    const setupTokenRefresh = spyOn(service, 'setupTokenRefresh');
-    service.tokenData = { refresh_token: 'refresh' };
+    const post = spyOn(http, 'post').and.returnValue(of({ access_token: 'test' }));
+
+    const td = service.tokenData
+      .pipe(filter(e => !!e), skip(1), first())
+      .toPromise();
 
     const refresh = service.refreshToken();
 
     await expectAsync(refresh).toBeResolved();
-    expect(getDiscoveryDocument).toHaveBeenCalled();
-    expect(httpPost).toHaveBeenCalled();
-    expect(setupTokenRefresh).toHaveBeenCalled();
+    await expectAsync(td).toBeResolvedTo({ access_token: 'test', stored_at: jasmine.anything() });
+    expect(post).toHaveBeenCalled();
+  });
+
+  it('should throw if token data is missing', async () => {
+    const refresh = service.refreshToken();
+    await expectAsync(refresh).toBeRejectedWith(new Error('Missing tokenData'));
   });
 
   it('should handle token refresh error', async () => {
-    const getDiscoveryDocument = spyOn(service, 'getDiscoveryDocument')
-      .and.returnValue(Promise.resolve({ token_endpoint: 'endpoint' }));
+    service.getStoredTokenData = () => ({ refresh_token: 'refresh token' });
+    service.setStoredTokenData = () => { };
+    service.getDiscoveryDocument = () => Promise.resolve({ token_endpoint: 'endpoint' });
+    service.setupTokenRefresh = () => Promise.resolve();
+    service.auth();
 
-    const httpPost = spyOn(http, 'post').and.returnValue(throwError({}));
-    const requestAuthorizationCode = spyOn(service, 'requestAuthorizationCode');
-    const setupTokenRefresh = spyOn(service, 'setupTokenRefresh');
-    service.tokenData = { refresh_token: 'refresh' };
+    const get = spyOn(http, 'post').and.returnValue(throwError(new Error('test error')));
+    const requestAuthorizationCode = spyOn(service, 'requestAuthorizationCode').and.returnValue(Promise.resolve());
 
     const refresh = service.refreshToken();
 
     await expectAsync(refresh).toBeResolved();
-    expect(getDiscoveryDocument).toHaveBeenCalled();
-    expect(httpPost).toHaveBeenCalled();
+    expect(get).toHaveBeenCalled();
     expect(requestAuthorizationCode).toHaveBeenCalled();
-    expect(setupTokenRefresh).not.toHaveBeenCalled();
   });
 
   it('should automatically refresh token after a while', async () => {
@@ -185,16 +190,14 @@ describe('AuthService', () => {
     const date = new Date();
     jasmine.clock().mockDate(date);
 
-    service.tokenData = {
-      expires_in: '1'
-    };
-
     const refreshToken = spyOn(service, 'refreshToken').and.returnValue(Promise.resolve());
-    const setup = service.setupTokenRefresh();
+    const setup = spyOn(service, 'setupTokenRefresh').and.callThrough();
+    service.getStoredTokenData = () => ({ expires_in: '1' });
+    service.auth();
 
     jasmine.clock().tick(10);
 
-    await expectAsync(setup).toBeResolved();
+    expect(setup).toHaveBeenCalled();
     expect(refreshToken).toHaveBeenCalled();
 
     jasmine.clock().uninstall();
@@ -205,15 +208,14 @@ describe('AuthService', () => {
     const date = new Date();
     jasmine.clock().mockDate(date);
 
-    service.tokenData = {
-      expires_in: '1'
-    };
+    const refreshToken = spyOn(service, 'refreshToken').and.returnValue(Promise.resolve());
+    const setup = spyOn(service, 'setupTokenRefresh').and.callThrough();
+    service.getStoredTokenData = () => ({ expires_in: '1' });
+    service.auth();
 
     jasmine.clock().tick(20);
 
-    const refreshToken = spyOn(service, 'refreshToken').and.returnValue(Promise.resolve());
-    const setup = service.setupTokenRefresh();
-    await expectAsync(setup).toBeResolved();
+    expect(setup).toHaveBeenCalled();
     expect(refreshToken).toHaveBeenCalled();
 
     jasmine.clock().uninstall();

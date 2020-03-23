@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { first } from 'rxjs/operators';
 
 describe('TokenInterceptor', () => {
   let authService: AuthService;
@@ -21,9 +22,18 @@ describe('TokenInterceptor', () => {
     });
 
     authService = TestBed.get(AuthService);
-    authService.tokenData = { id_token: 'id_token' };
     http = TestBed.get(HttpClient);
     controller = TestBed.get(HttpTestingController);
+
+    authService.getStoredTokenData = () => ({ id_token: 'token' });
+    authService.setStoredTokenData = () => { };
+    authService.setupTokenRefresh = async () => { };
+    authService.auth();
+  });
+
+  it('should get tokenData', async () => {
+    const data = await authService.tokenData.pipe(first()).toPromise();
+    expect(data).toBeTruthy();
   });
 
   it('should create an instance', () => {
