@@ -2,14 +2,14 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf, IdClaims, AUTH_CONF } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, filter } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   discoveryDocument: DiscoveryDocument;
-  private tokenDataSub = new BehaviorSubject<TokenData>(null);
+  private tokenDataSub = new BehaviorSubject<TokenData>(undefined);
 
   readonly tokenData = this.tokenDataSub
     .asObservable()
@@ -25,22 +25,26 @@ export class AuthService {
     private http: HttpClient,
     @Inject(AUTH_CONF) private authConf: AuthConf
   ) {
-    this.tokenData.subscribe(td => {
+    this.tokenData.pipe(
+      filter(v => v !== undefined)
+    ).subscribe(td => {
       if (td) {
         this.setStoredTokenData(td);
         this.setupTokenRefresh();
+      } else {
+        this.clearStoredTokenData();
       }
     });
   }
 
   async auth(): Promise<void> {
     const tokenData = this.getStoredTokenData();
-    const urlParams = this.getUrlParams();
     if (tokenData) {
       this.tokenDataSub.next(tokenData);
       return;
     }
 
+    const urlParams = this.getUrlParams();
     const authorizationCode = urlParams.get('code');
 
     const action = authorizationCode ?
@@ -114,6 +118,10 @@ export class AuthService {
 
     const tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
     this.tokenDataSub.next(tokenData);
+  }
+
+  logout() {
+    this.tokenDataSub.next(null);
   }
 
   getIdClaims(tokenData: TokenData): IdClaims {
@@ -228,7 +236,7 @@ export class AuthService {
 
   getUrlParams(): HttpParams {
     const params = new HttpParams({ fromString: location.search.slice(1) });
-    history.replaceState({}, '', '');
+    history.replaceState(null, '', '');
     return params;
   }
 }

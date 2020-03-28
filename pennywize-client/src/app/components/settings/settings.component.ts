@@ -14,7 +14,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   get profile() {
     return {
-      background: `#0000 url(${this.claims.picture})`,
+      background: `#0000 url('${this.claims.picture})'`,
       backgroundSize: 'contain'
     };
   }
@@ -26,8 +26,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   logout() {
-    // TODO are you sure popup
-    // TODO create logout method in auth service
+    this.a.logout();
+    this.a.auth();
   }
 
   ngOnDestroy() {

@@ -87,8 +87,6 @@ describe('AuthService', () => {
       .pipe(filter(c => !!c), first(), tap(c => claims = c))
       .toPromise();
 
-    const getUrlParams = spyOn(service, 'getUrlParams');
-
     service.getStoredTokenData = () => td;
     service.setupTokenRefresh = async () => {};
     service.auth();
@@ -100,8 +98,6 @@ describe('AuthService', () => {
       name: 'John Doe',
       iat: 1516239022
     });
-
-    expect(getUrlParams).toHaveBeenCalled();
   });
 
   it('should throw if login fails', async () => {
