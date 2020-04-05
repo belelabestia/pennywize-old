@@ -5,7 +5,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { IdClaims } from 'src/app/auth/interfaces';
 
-fdescribe('SettingsComponent', () => {
+describe('SettingsComponent', () => {
   let component: SettingsComponent;
   let fixture: ComponentFixture<SettingsComponent>;
   let service: Partial<AuthService>;
