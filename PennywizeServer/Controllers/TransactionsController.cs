@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +24,9 @@ namespace PennywizeServer.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
         {
-            return await _context.Transactions.ToListAsync();
+            return await _context.Transactions
+                .Where(t => t.UserId == GetUserId())
+                .ToListAsync();
         }
 
         // GET: api/Transactions/5
@@ -34,7 +35,7 @@ namespace PennywizeServer.Controllers
         {
             var transaction = await _context.Transactions.FindAsync(id);
 
-            if (transaction == null)
+            if (transaction == null || transaction.UserId != GetUserId())
             {
                 return NotFound();
             }
@@ -80,7 +81,9 @@ namespace PennywizeServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
+            transaction.UserId = GetUserId();
             _context.Transactions.Add(transaction);
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -119,6 +122,11 @@ namespace PennywizeServer.Controllers
         private bool TransactionExists(string id)
         {
             return _context.Transactions.Any(e => e.Id == id);
+        }
+
+        private string GetUserId()
+        {
+            return HttpContext.User.Claims.First(c => c.Type == "sub").Value;
         }
     }
 }

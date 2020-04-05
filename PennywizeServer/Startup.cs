@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,7 +15,10 @@ namespace PennywizeServer
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();
+
             using (var dbc = new PennywizeContext())
             {
                 dbc.Database.Migrate();
@@ -30,7 +34,8 @@ namespace PennywizeServer
             services.AddDbContext<PennywizeContext>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => {
+                .AddJwtBearer(options =>
+                {
                     options.Authority = "https://accounts.google.com";
                     options.Audience = "748180026787-gnbgs0f358t6qq5v9ph8aanovq39pkee.apps.googleusercontent.com";
                 });

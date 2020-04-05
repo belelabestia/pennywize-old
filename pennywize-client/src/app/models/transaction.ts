@@ -4,6 +4,7 @@ export class Transaction {
   amount: number;
   type: string;
   description: string;
+  userId: string;
 
   constructor(partial?: Partial<Transaction>) {
     Object.assign(this, partial);

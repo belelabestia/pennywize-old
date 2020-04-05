@@ -9,8 +9,8 @@ using PennywizeServer.Models;
 namespace PennywizeServer.Migrations
 {
     [DbContext(typeof(PennywizeContext))]
-    [Migration("20191207235308_Transactions")]
-    partial class Transactions
+    [Migration("20200329182307_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -34,6 +34,9 @@ namespace PennywizeServer.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

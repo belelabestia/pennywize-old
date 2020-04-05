@@ -34,6 +34,9 @@ namespace PennywizeServer.Migrations
                     b.Property<string>("Type")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Transactions");
