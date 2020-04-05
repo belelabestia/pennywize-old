@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { DiscoveryDocument, TokenData, AuthConf, IdClaims, AUTH_CONF } from './interfaces';
 import { timer, BehaviorSubject } from 'rxjs';
-import { map, tap, filter } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -11,36 +11,17 @@ export class AuthService {
   discoveryDocument: DiscoveryDocument;
   private tokenDataSub = new BehaviorSubject<TokenData>(undefined);
 
-  readonly tokenData = this.tokenDataSub
-    .asObservable()
-    .pipe(tap(td => {
-      if (td) {
-        td.stored_at = '' + new Date().getTime();
-      }
-    }));
-
+  readonly tokenData = this.tokenDataSub.asObservable();
   readonly idClaims = this.tokenData.pipe(map(td => this.getIdClaims(td)));
 
   constructor(
     private http: HttpClient,
     @Inject(AUTH_CONF) private authConf: AuthConf
-  ) {
-    this.tokenData.pipe(
-      filter(v => v !== undefined)
-    ).subscribe(td => {
-      if (td) {
-        this.setStoredTokenData(td);
-        this.setupTokenRefresh();
-      } else {
-        this.clearStoredTokenData();
-      }
-    });
-  }
+  ) { }
 
   async auth(): Promise<void> {
-    const tokenData = this.getStoredTokenData();
-    if (tokenData) {
-      this.tokenDataSub.next(tokenData);
+    if (this.getStoredTokenData()) {
+      await this.setupTokenRefresh();
       return;
     }
 
@@ -117,11 +98,11 @@ export class AuthService {
     postData.append('code_verifier', storedVerifier);
 
     const tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
-    this.tokenDataSub.next(tokenData);
+    this.setStoredTokenData(tokenData);
   }
 
   logout() {
-    this.tokenDataSub.next(null);
+    this.clearStoredTokenData();
   }
 
   getIdClaims(tokenData: TokenData): IdClaims {
@@ -141,21 +122,35 @@ export class AuthService {
     return payload;
   }
 
-  getStoredTokenData() {
-    return JSON.parse(localStorage.getItem('tokenData')) as TokenData;
+  getStoredTokenData(): TokenData {
+    if (!this.tokenDataSub.value) {
+      const td = JSON.parse(localStorage.getItem('tokenData')) as TokenData;
+      this.tokenDataSub.next(td);
+    }
+
+    return this.tokenDataSub.value;
   }
 
-  setStoredTokenData(td: TokenData) {
-    td = { ...this.getStoredTokenData(), ...td };
+  setStoredTokenData(td: TokenData): void {
+    td = {
+      ...this.getStoredTokenData(),
+      ...td,
+      stored_at: '' + new Date().getTime()
+    };
+
+    this.tokenDataSub.next(td);
     localStorage.setItem('tokenData', JSON.stringify(td));
+
+    this.setupTokenRefresh();
   }
 
-  clearStoredTokenData() {
+  clearStoredTokenData(): void {
+    this.tokenDataSub.next(null);
     localStorage.removeItem('tokenData');
   }
 
   async refreshToken(): Promise<void> {
-    let tokenData = this.tokenDataSub.value;
+    let tokenData = this.getStoredTokenData();
 
     if (!tokenData) {
       throw new Error('Missing tokenData');
@@ -173,7 +168,7 @@ export class AuthService {
 
     try {
       tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
-      this.tokenDataSub.next(tokenData);
+      this.setStoredTokenData(tokenData);
     } catch {
       this.clearStoredTokenData();
       await this.requestAuthorizationCode();
@@ -181,7 +176,7 @@ export class AuthService {
   }
 
   async setupTokenRefresh(): Promise<void> {
-    const tokenData = this.tokenDataSub.value;
+    const tokenData = this.getStoredTokenData();
 
     if (!this.authConf.refreshAfter || !(tokenData || {} as TokenData).expires_in) {
       throw new Error('Missing refresh data');
@@ -199,9 +194,7 @@ export class AuthService {
       return;
     }
 
-    timer(refreshIn).subscribe(async () => {
-      await this.refreshToken();
-    });
+    timer(refreshIn).subscribe(() => this.refreshToken());
   }
 
   generateRandomString(): string {

@@ -10,13 +10,13 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService, @Inject(AUTH_CONF) private conf: AuthConf) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    return this.auth.tokenData.pipe(first(), switchMap(td => {
-      const tokenReq = req.url.startsWith(this.conf.apiPath) && td.id_token ?
-        req.clone({ setHeaders: { Authorization: `Bearer ${td.id_token}` } }) :
-        req;
+    const td = this.auth.getStoredTokenData();
 
-      return next.handle(tokenReq);
-    }));
+    const tokenReq = req.url.startsWith(this.conf.apiPath) && td.id_token ?
+      req.clone({ setHeaders: { Authorization: `Bearer ${td.id_token}` } }) :
+      req;
+
+    return next.handle(tokenReq);
   }
 }
 
