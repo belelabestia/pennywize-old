@@ -7,6 +7,7 @@ namespace PennywizeServer
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
+
         public DateTime Date { get; set; }
         public double Amount { get; set; }
         public string Type { get; set; }

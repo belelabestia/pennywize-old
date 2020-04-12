@@ -26,7 +26,7 @@ namespace PennywizeServer.Controllers
         {
             return await _context.Transactions
                 .Where(t => t.UserId == GetUserId())
-                .ToListAsync();
+                .ToArrayAsync();
         }
 
         // GET: api/Transactions/5
@@ -35,9 +35,14 @@ namespace PennywizeServer.Controllers
         {
             var transaction = await _context.Transactions.FindAsync(id);
 
-            if (transaction == null || transaction.UserId != GetUserId())
+            if (transaction == null)
             {
                 return NotFound();
+            }
+
+            if (transaction.UserId != GetUserId())
+            {
+                return Forbid();
             }
 
             return transaction;
@@ -47,13 +52,33 @@ namespace PennywizeServer.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutTransaction(string id, Transaction transaction)
+        public async Task<ActionResult> PutTransaction(string id, Transaction transaction)
         {
             if (id != transaction.Id)
             {
                 return BadRequest();
             }
 
+            var t = await _context.Transactions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(tr => tr.Id == id);
+
+            if (t == null)
+            {
+                return NotFound();
+            }
+
+            if (t.UserId != GetUserId())
+            {
+                return Forbid();
+            }
+
+            if (transaction.UserId != null && transaction.UserId != t.UserId)
+            {
+                return BadRequest();
+            }
+
+            transaction.UserId = t.UserId;
             _context.Entry(transaction).State = EntityState.Modified;
 
             try
@@ -81,7 +106,12 @@ namespace PennywizeServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
-            transaction.UserId = GetUserId();
+            if (transaction.UserId != null && transaction.UserId != GetUserId())
+            {
+                return Forbid();
+            }
+
+            transaction.UserId ??= GetUserId();
             _context.Transactions.Add(transaction);
 
             try
@@ -111,6 +141,11 @@ namespace PennywizeServer.Controllers
             if (transaction == null)
             {
                 return NotFound();
+            }
+
+            if (transaction.UserId != GetUserId())
+            {
+                return Forbid();
             }
 
             _context.Transactions.Remove(transaction);
