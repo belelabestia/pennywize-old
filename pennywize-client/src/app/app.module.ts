@@ -14,6 +14,7 @@ import localeIt from '@angular/common/locales/it';
 import { authProviders } from './auth/token-interceptor';
 import { authConf } from './auth/auth.conf';
 import { SettingsComponent } from './components/settings/settings.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 registerLocaleData(localeIt);
 
@@ -23,7 +24,8 @@ registerLocaleData(localeIt);
     TransactionComponent,
     TransactionsComponent,
     EditTransactionComponent,
-    SettingsComponent
+    SettingsComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,

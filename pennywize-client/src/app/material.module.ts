@@ -10,7 +10,8 @@ import {
   MatFormFieldModule,
   MAT_DATE_LOCALE,
   MatProgressSpinnerModule,
-  MatListModule
+  MatListModule,
+  MatRippleModule
 } from '@angular/material';
 
 const modules = [
@@ -22,7 +23,8 @@ const modules = [
   MatNativeDateModule,
   MatFormFieldModule,
   MatProgressSpinnerModule,
-  MatListModule
+  MatListModule,
+  MatRippleModule
 ];
 
 @NgModule({

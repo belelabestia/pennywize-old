@@ -8,16 +8,7 @@
         </mat-card-title>
     </mat-card-header>
     <mat-card-content>
-        <mat-card id="profile">
-            <mat-card-header>
-                <div mat-card-avatar id="profile-pic" [ngStyle]="profile"></div>
-                <div id="fallback-profile-pic">
-                    <mat-icon mat-card-avatar>person</mat-icon>
-                </div>
-                <mat-card-title>{{claims.name}}</mat-card-title>
-                <mat-card-subtitle>{{claims.email}}</mat-card-subtitle>
-            </mat-card-header>
-        </mat-card>
+        <app-profile></app-profile>
         <mat-nav-list>
             <mat-list-item (click)="logout()">Log out</mat-list-item>
             <a mat-list-item routerLink="download-data">Download personal data</a>

@@ -8,12 +8,20 @@
     flex-direction: column;
 }
 
-#transactions {
+#content {
     flex: 1 1 auto;
     height: 100%;
     overflow: auto;
     box-sizing: border-box;
     padding: 24px;
+}
+
+app-profile {
+    display: block;
+}
+
+mat-divider {
+    margin: 16px 0;
 }
 
 app-transaction + app-transaction {
