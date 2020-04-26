@@ -13,155 +13,96 @@ namespace PennywizeServer.Controllers
     [Authorize]
     public class TransactionsController : ControllerBase
     {
-        private readonly PennywizeContext _context;
+        private readonly PennywizeContext context;
+        private readonly string userId;
 
         public TransactionsController(PennywizeContext context)
         {
-            _context = context;
+            this.context = context;
+            userId = HttpContext.User.Claims.First(c => c.Type == "sub").Value;
         }
 
-        // GET: api/Transactions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions()
-        {
-            return await _context.Transactions
-                .Where(t => t.UserId == GetUserId())
+        public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions() =>
+            await context.Transactions
+                .Where(t => t.UserId == userId)
                 .ToArrayAsync();
-        }
 
-        // GET: api/Transactions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(string id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
+            var transaction = await context.Transactions.FindAsync(id);
 
-            if (transaction == null)
-            {
-                return NotFound();
-            }
-
-            if (transaction.UserId != GetUserId())
-            {
-                return Forbid();
-            }
+            if (transaction == null) return NotFound();
+            if (transaction.UserId != userId) return Forbid();
 
             return transaction;
         }
 
-        // PUT: api/Transactions/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
         public async Task<ActionResult> PutTransaction(string id, Transaction transaction)
         {
-            if (id != transaction.Id)
-            {
-                return BadRequest();
-            }
+            if (id != transaction.Id) return BadRequest();
 
-            var t = await _context.Transactions
+            var t = await context.Transactions
                 .AsNoTracking()
                 .FirstOrDefaultAsync(tr => tr.Id == id);
 
-            if (t == null)
-            {
-                return NotFound();
-            }
-
-            if (t.UserId != GetUserId())
-            {
-                return Forbid();
-            }
-
-            if (transaction.UserId != null && transaction.UserId != t.UserId)
-            {
-                return BadRequest();
-            }
+            if (t == null) return NotFound();
+            if (t.UserId != userId) return Forbid();
+            if (transaction.UserId != null && transaction.UserId != t.UserId) return BadRequest();
 
             transaction.UserId = t.UserId;
-            _context.Entry(transaction).State = EntityState.Modified;
+            context.Entry(transaction).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TransactionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!TransactionExists(id)) return NotFound();
+                else throw;
             }
 
             return NoContent();
         }
 
-        // POST: api/Transactions
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
-            if (transaction.UserId != null && transaction.UserId != GetUserId())
-            {
-                return Forbid();
-            }
+            if (transaction.UserId != null && transaction.UserId != userId) return Forbid();
 
-            transaction.UserId ??= GetUserId();
-            _context.Transactions.Add(transaction);
+            transaction.UserId ??= userId;
+            context.Transactions.Add(transaction);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (TransactionExists(transaction.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
+                if (TransactionExists(transaction.Id)) return Conflict();
+                else throw;
             }
 
             return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
         }
 
-        // DELETE: api/Transactions/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Transaction>> DeleteTransaction(string id)
         {
-            var transaction = await _context.Transactions.FindAsync(id);
-            if (transaction == null)
-            {
-                return NotFound();
-            }
+            var transaction = await context.Transactions.FindAsync(id);
 
-            if (transaction.UserId != GetUserId())
-            {
-                return Forbid();
-            }
+            if (transaction == null) return NotFound();
+            if (transaction.UserId != userId) return Forbid();
 
-            _context.Transactions.Remove(transaction);
-            await _context.SaveChangesAsync();
+            context.Transactions.Remove(transaction);
+            await context.SaveChangesAsync();
 
             return transaction;
         }
 
-        private bool TransactionExists(string id)
-        {
-            return _context.Transactions.Any(e => e.Id == id);
-        }
-
-        private string GetUserId()
-        {
-            return HttpContext.User.Claims.First(c => c.Type == "sub").Value;
-        }
+        private bool TransactionExists(string id) => context.Transactions.Any(e => e.Id == id);
     }
 }
