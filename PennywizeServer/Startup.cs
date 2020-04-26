@@ -1,3 +1,4 @@
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +16,9 @@ namespace PennywizeServer
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            var a = Environment.GetEnvironmentVariable("Suka");
+            Console.WriteLine(a);
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             JwtSecurityTokenHandler.DefaultOutboundClaimTypeMap.Clear();

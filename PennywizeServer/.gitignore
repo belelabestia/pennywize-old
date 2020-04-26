@@ -434,3 +434,6 @@ $RECYCLE.BIN/
 
 # Db file
 pennywize.db
+
+# launchSettings.json
+Properties/launchSettings.json
