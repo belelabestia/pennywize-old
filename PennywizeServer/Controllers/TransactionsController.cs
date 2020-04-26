@@ -14,13 +14,9 @@ namespace PennywizeServer.Controllers
     public class TransactionsController : ControllerBase
     {
         private readonly PennywizeContext context;
-        private readonly string userId;
+        private string userId => HttpContext.User.Claims.First(c => c.Type == "sub").Value;
 
-        public TransactionsController(PennywizeContext context)
-        {
-            this.context = context;
-            userId = HttpContext.User.Claims.First(c => c.Type == "sub").Value;
-        }
+        public TransactionsController(PennywizeContext context) => this.context = context;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions() =>
