@@ -14,12 +14,10 @@ export class TransactionService {
   constructor(private hc: HttpClient) { }
 
   async get(): Promise<void> {
-    let newTt = await this.hc.get<Transaction[]>(this.url).toPromise();
-    newTt = newTt.map(t => new Transaction(t));
+    const newTt = (await this.hc.get<Transaction[]>(this.url).toPromise())
+      .map(t => new Transaction(t));
 
-    const tt = this.transactionsSub.value;
-    tt.push(...newTt);
-    this.transactionsSub.next(tt.map(t => new Transaction(t)));
+    this.transactionsSub.next(newTt);
   }
 
   async post(t: Transaction): Promise<void> {

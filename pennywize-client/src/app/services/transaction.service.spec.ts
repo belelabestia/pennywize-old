@@ -58,6 +58,43 @@ describe('TransactionService', () => {
     await expectAsync(Promise.all([get, tt])).toBeResolved();
   });
 
+  fit('should refresh transactions', async () => {
+    const transactions: Transaction[] = [
+      new Transaction({
+        id: 'gubh78yb79bt',
+        amount: 340,
+        date: new Date(),
+        type: 'benzina',
+        description: 'esfpjpigvp'
+      }),
+      new Transaction({
+        id: 'fhush8werh',
+        amount: 340,
+        date: new Date(),
+        type: 'svago',
+        description: 'fheshesiohfs'
+      }),
+      new Transaction({
+        id: '78tb7tbt87tn',
+        amount: 340,
+        date: new Date(),
+        type: 'bollette',
+        description: 'gas'
+      }),
+    ];
+
+    const get = service.get();
+    controller.expectOne(service.url).flush(transactions);
+    await get;
+
+    const tt = service.transactions.pipe(skip(1), first()).toPromise();
+    const get1 = service.get();
+    controller.expectOne(service.url).flush(transactions);
+    await get1;
+
+    await expectAsync(tt).toBeResolvedTo(transactions);
+  });
+
   it('should post a transaction', async () => {
     const transaction = new Transaction({
       id: 'fhtc5ueyc89ny',
