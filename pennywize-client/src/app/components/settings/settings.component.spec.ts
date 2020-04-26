@@ -41,18 +41,10 @@ describe('SettingsComponent', () => {
   });
 
   it('should create', () => {
-    component.ngOnInit();
     expect(component).toBeTruthy();
   });
 
-  it('should get claims', () => {
-    component.ngOnInit();
-    expect(component.claims).toBeDefined();
-  });
-
   it('should logout', () => {
-    component.ngOnInit();
-
     const logout = spyOn(service, 'logout');
     const auth = spyOn(service, 'auth');
 

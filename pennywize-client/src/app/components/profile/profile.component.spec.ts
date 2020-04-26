@@ -22,4 +22,9 @@ describe('ProfileComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  
+  it('should get claims', () => {
+    component.ngOnInit();
+    expect(component.claims).toBeDefined();
+  });
 });

@@ -106,6 +106,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         this.cd.markForCheck();
         this.requesting = false;
       });
+
+    this.add();
   }
 
   async delete() {

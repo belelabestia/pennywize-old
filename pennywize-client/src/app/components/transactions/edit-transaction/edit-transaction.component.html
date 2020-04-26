@@ -1,18 +1,18 @@
-<form id="form" [formGroup]="form" (ngSubmit)="emitSave()">
+<form id="form" [formGroup]="formGroup" (ngSubmit)="emitSave()">
     <div id="fields">
         <mat-form-field appearance="outline">
             <input matInput formControlName="date" [matDatepicker]="picker" placeholder="Date">
             <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
-            <mat-error *ngIf="form.controls.date.invalid">Date cannot be empty</mat-error>
+            <mat-error *ngIf="formGroup.controls.date.invalid">Date cannot be empty</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
             <input matInput formControlName="amount" type="number" placeholder="Amount">
-            <mat-error *ngIf="form.controls.amount.invalid">Amount cannot be empty</mat-error>
+            <mat-error *ngIf="formGroup.controls.amount.invalid">Amount cannot be empty</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
             <input matInput formControlName="type" type="text" placeholder="Type">
-            <mat-error *ngIf="form.controls.type.invalid">Type cannot be empty</mat-error>
+            <mat-error *ngIf="formGroup.controls.type.invalid">Type cannot be empty</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
             <input matInput formControlName="description" type="text" placeholder="Description">

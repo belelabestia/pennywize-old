@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, ViewChild } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormGroupDirective, NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-transaction',
@@ -9,7 +9,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditTransactionComponent {
-  form = this.fb.group({
+  @ViewChild(FormGroupDirective, { static: true }) form: NgForm;
+
+  formGroup = this.fb.group({
     id: [undefined],
     amount: ['', Validators.required],
     date: ['', Validators.required],
@@ -26,7 +28,7 @@ export class EditTransactionComponent {
   }
 
   get transaction(): Transaction {
-    return this.form ? new Transaction(this.form.value) : undefined;
+    return this.formGroup ? new Transaction(this.formGroup.value) : undefined;
   }
 
   @Input() set disabled(d: boolean) {
@@ -34,7 +36,7 @@ export class EditTransactionComponent {
   }
 
   get disabled(): boolean {
-    return this.form ? this.form.disabled : false;
+    return this.formGroup ? this.formGroup.disabled : false;
   }
 
   get canDelete() {
@@ -44,9 +46,11 @@ export class EditTransactionComponent {
   constructor(private fb: FormBuilder) { }
 
   emitSave() {
-    if (this.form && this.form.valid) {
+    if (this.formGroup && this.formGroup.valid) {
       this.save.emit(this.transaction);
     }
+
+    this.form.resetForm();
   }
 
   @HostListener('window:keyup.esc')
@@ -66,12 +70,13 @@ export class EditTransactionComponent {
       return;
     }
 
-    this.form.patchValue(transaction);
+    this.formGroup.reset();
+    this.formGroup.patchValue(transaction);
 
     if (disabled) {
-      this.form.disable();
+      this.formGroup.disable();
     } else {
-      this.form.enable();
+      this.formGroup.enable();
     }
   }
 }

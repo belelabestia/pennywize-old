@@ -63,10 +63,10 @@ describe('EditTransactionComponent', () => {
 
     component.save.subscribe(save);
 
-    component.form.controls.type.setValue('hfiashfpiahfs');
-    component.form.controls.amount.setValue(50);
-    component.form.controls.description.setValue('jvipdhgpohjspdjhsdfpj');
-    component.form.controls.date.setValue('2005-11-25');
+    component.formGroup.controls.type.setValue('hfiashfpiahfs');
+    component.formGroup.controls.amount.setValue(50);
+    component.formGroup.controls.description.setValue('jvipdhgpohjspdjhsdfpj');
+    component.formGroup.controls.date.setValue('2005-11-25');
 
     component.emitSave();
 
@@ -84,11 +84,11 @@ describe('EditTransactionComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.form.value.id).toBe('f94wy8vycr4dw3');
-    expect(component.form.value.amount).toBe(50);
-    expect(component.form.value.date.getTime()).toBe(new Date('2020-04-02').getTime());
-    expect(component.form.value.description).toBe('some desc');
-    expect(component.form.value.type).toBe('some type');
+    expect(component.formGroup.value.id).toBe('f94wy8vycr4dw3');
+    expect(component.formGroup.value.amount).toBe(50);
+    expect(component.formGroup.value.date.getTime()).toBe(new Date('2020-04-02').getTime());
+    expect(component.formGroup.value.description).toBe('some desc');
+    expect(component.formGroup.value.type).toBe('some type');
 
     component.transaction = new Transaction({
       id: 'ouguogouguogug',
@@ -100,11 +100,11 @@ describe('EditTransactionComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.form.value.id).toBe('ouguogouguogug');
-    expect(component.form.value.amount).toBe(60);
-    expect(component.form.value.date.getTime()).toBe(new Date('2019-05-03').getTime());
-    expect(component.form.value.description).toBe('some other desc');
-    expect(component.form.value.type).toBe('some other type');
+    expect(component.formGroup.value.id).toBe('ouguogouguogug');
+    expect(component.formGroup.value.amount).toBe(60);
+    expect(component.formGroup.value.date.getTime()).toBe(new Date('2019-05-03').getTime());
+    expect(component.formGroup.value.description).toBe('some other desc');
+    expect(component.formGroup.value.type).toBe('some other type');
   });
 
   it('should update form when disabled changes', () => {
@@ -118,10 +118,10 @@ describe('EditTransactionComponent', () => {
 
     component.disabled = true;
     fixture.detectChanges();
-    expect(component.form.disabled).toBe(true);
+    expect(component.formGroup.disabled).toBe(true);
 
     component.disabled = false;
     fixture.detectChanges();
-    expect(component.form.enabled).toBe(true);
+    expect(component.formGroup.enabled).toBe(true);
   });
 });

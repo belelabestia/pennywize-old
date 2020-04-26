@@ -58,7 +58,7 @@ describe('TransactionService', () => {
     await expectAsync(Promise.all([get, tt])).toBeResolved();
   });
 
-  fit('should refresh transactions', async () => {
+  it('should refresh transactions', async () => {
     const transactions: Transaction[] = [
       new Transaction({
         id: 'gubh78yb79bt',
