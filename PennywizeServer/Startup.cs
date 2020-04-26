@@ -38,8 +38,8 @@ namespace PennywizeServer
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    options.Authority = "https://accounts.google.com";
-                    options.Audience = "748180026787-gnbgs0f358t6qq5v9ph8aanovq39pkee.apps.googleusercontent.com";
+                    options.Authority = Configuration.GetValue<string>("login_authority");
+                    options.Audience = Configuration.GetValue<string>("login_audience");
                 });
         }
 
