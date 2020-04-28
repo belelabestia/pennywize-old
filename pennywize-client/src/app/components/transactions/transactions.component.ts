@@ -2,8 +2,9 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostBind
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
-import { ErrorService } from 'src/app/services/error.service';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material';
+import { ErrorComponent } from '../error/error.component';
 
 @Component({
   selector: 'app-transactions',
@@ -14,7 +15,7 @@ import { Subscription } from 'rxjs';
 export class TransactionsComponent implements OnInit, OnDestroy {
   @HostBinding('class.mobile') isMobile = false;
   transactions: Transaction[];
-  subscriptions: Subscription[] = [];
+  subscription = new Subscription();
 
   current: Transaction;
   requesting = false;
@@ -29,9 +30,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private t: TransactionService,
-    private e: ErrorService,
     private cd: ChangeDetectorRef,
-    private bo: BreakpointObserver
+    private bo: BreakpointObserver,
+    private d: MatDialog
   ) { }
 
   async ngOnInit() {
@@ -40,18 +41,20 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       this.cd.detectChanges();
     });
 
-    this.subscriptions.push(sub);
+    this.subscription.add(sub);
 
-    await this.t.get()
-      .catch(() => { this.e.dispatch('error loading transactions'); });
+    try {
+      await this.t.get();
+    } catch {
+      this.d.open(ErrorComponent, { data: 'error loading transactions' });
+    }
 
-    this.bo.observe([Breakpoints.Handset]).subscribe(result => {
-      this.isMobile = result.matches;
-    });
+    this.bo.observe([Breakpoints.Handset])
+      .subscribe(result => this.isMobile = result.matches);
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(s => { s.unsubscribe(); });
+    this.subscription.unsubscribe();
   }
 
   add() {
@@ -100,12 +103,14 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     const operation = this.current.id ? () => this.put() : () => this.post();
 
-    await operation()
-      .catch(() => { this.e.dispatch('error saving transaction'); })
-      .finally(() => {
-        this.cd.markForCheck();
-        this.requesting = false;
-      });
+    try {
+      await operation();
+    } catch {
+      this.d.open(ErrorComponent, { data: 'error saving transaction' });
+    } finally {
+      this.cd.markForCheck();
+      this.requesting = false;
+    }
 
     this.add();
   }
@@ -113,13 +118,15 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   async delete() {
     this.requesting = true;
 
-    await this.t.delete(this.current)
-      .catch(() => { this.e.dispatch('error deleting transaction'); })
-      .finally(() => {
-        this.cd.markForCheck();
-        this.requesting = false;
-        this.current = null;
-      });
+    try {
+      await this.t.delete(this.current);
+    } catch {
+      this.d.open(ErrorComponent, { data: 'error deleting transaction' });
+    } finally {
+      this.cd.markForCheck();
+      this.requesting = false;
+      this.current = null;
+    }
   }
 
   private async post() {

@@ -1,16 +1,14 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
-import { ErrorService } from './services/error.service';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from './auth/auth.service';
 import { BehaviorSubject } from 'rxjs';
 import { IdClaims } from './auth/interfaces';
-import { MaterialModule } from './material.module';
+import { MaterialModule } from './modules/material.module';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
-  let service: ErrorService;
   let component: AppComponent;
   let authServiceStub: Partial<AuthService>;
 
@@ -39,18 +37,11 @@ describe('AppComponent', () => {
     });
 
     fixture = TestBed.createComponent(AppComponent);
-    service = TestBed.get(ErrorService);
     component = fixture.componentInstance;
   });
 
   it('should create the app', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should receive error', async () => {
-    await component.ngOnInit();
-    service.dispatch('test error');
-    expect(component.errorMessage).toBe('test error');
   });
 
   it('should try authentication', async () => {

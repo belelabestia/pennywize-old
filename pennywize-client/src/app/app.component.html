@@ -1,11 +1,5 @@
 <mat-spinner *ngIf="logging; else app"></mat-spinner>
 
 <ng-template #app>
-  <span id="content">
-    <router-outlet></router-outlet>
-  </span>
-  <dialog [open]="errorMessage">
-    {{errorMessage}}
-    <button (click)="dismissError()">Ok</button>
-  </dialog>
+  <router-outlet></router-outlet>
 </ng-template>
