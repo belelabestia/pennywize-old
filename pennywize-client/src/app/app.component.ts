@@ -10,12 +10,11 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent implements OnInit {
   errorMessage: string;
   subscription = new Subscription();
-  logging: boolean;
+  logging = true;
 
   constructor(private a: AuthService) { }
 
   async ngOnInit() {
-    this.logging = true;
     await this.a.auth();
     this.logging = false;
   }

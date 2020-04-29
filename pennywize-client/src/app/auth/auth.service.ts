@@ -72,7 +72,7 @@ export class AuthService {
     });
 
     const url = `${authorizationEndpoint}?${authorizationParams.toString()}`;
-    this.navigateTo(url);
+    await this.navigateTo(url);
   }
 
   async validateStateAndRequestToken(urlParams: HttpParams): Promise<void> {
@@ -223,13 +223,13 @@ export class AuthService {
     return data;
   }
 
-  navigateTo(url: string): void {
-    location.href = url;
+  async navigateTo(url: string): Promise<void> {
+    await new Promise(() => location.href = url);
   }
 
   getUrlParams(): HttpParams {
     const params = new HttpParams({ fromString: location.search.slice(1) });
-    history.replaceState(null, '', '');
+    history.replaceState(null, window.name, location.pathname);
     return params;
   }
 }
