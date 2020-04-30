@@ -16,6 +16,11 @@ import { authConf } from './auth/auth.conf';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { ErrorComponent } from './components/error/error.component';
+import { DownloadPersonalDataComponent } from './components/download-personal-data/download-personal-data.component';
+import { DeleteAccountComponent } from './components/delete-account/delete-account.component';
+import { PrivacyComponent } from './components/privacy/privacy.component';
+import { TermsAndConditionsComponent } from './components/terms-and-conditions/terms-and-conditions.component';
+import { ThirdPartyComponent } from './components/third-party/third-party.component';
 
 registerLocaleData(localeIt);
 
@@ -27,7 +32,12 @@ registerLocaleData(localeIt);
     EditTransactionComponent,
     SettingsComponent,
     ProfileComponent,
-    ErrorComponent
+    ErrorComponent,
+    DownloadPersonalDataComponent,
+    DeleteAccountComponent,
+    PrivacyComponent,
+    TermsAndConditionsComponent,
+    ThirdPartyComponent
   ],
   imports: [
     BrowserModule,
