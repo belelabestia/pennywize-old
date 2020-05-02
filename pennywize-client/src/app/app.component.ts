@@ -24,7 +24,6 @@ export class AppComponent implements OnInit {
   }
 
   login() { this.a.login(); }
-  register() { this.a.login(); }
 }
 
 enum State {
