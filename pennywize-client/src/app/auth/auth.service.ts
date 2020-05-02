@@ -19,7 +19,8 @@ export class AuthService {
     @Inject(AUTH_CONF) private authConf: AuthConf
   ) { }
 
-  async auth(): Promise<void> {
+  async init() { await this.auth(false); }
+  async auth(redirect = true): Promise<void> {
     if (this.getStoredTokenData()) {
       await this.setupTokenRefresh();
       return;
@@ -28,11 +29,11 @@ export class AuthService {
     const urlParams = this.getUrlParams();
     const authorizationCode = urlParams.get('code');
 
-    const action = authorizationCode ?
-      () => this.validateStateAndRequestToken(urlParams) :
-      () => this.requestAuthorizationCode();
-
-    await action();
+    if (authorizationCode) {
+      await this.validateStateAndRequestToken(urlParams);
+    } else if (redirect) {
+      await this.requestAuthorizationCode();
+    }
   }
 
   async getDiscoveryDocument(): Promise<DiscoveryDocument> {
@@ -45,6 +46,7 @@ export class AuthService {
     return this.discoveryDocument;
   }
 
+  async login(): Promise<void> { await this.requestAuthorizationCode(); }
   async requestAuthorizationCode(): Promise<void> {
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
@@ -102,7 +104,7 @@ export class AuthService {
   }
 
   logout() {
-    this.clearStoredTokenData();
+    this.clearStoredAuthData();
   }
 
   getIdClaims(tokenData: TokenData): IdClaims {
@@ -124,7 +126,7 @@ export class AuthService {
 
   getStoredTokenData(): TokenData {
     if (!this.tokenDataSub.value) {
-      const td = JSON.parse(localStorage.getItem('tokenData')) as TokenData;
+      const td = JSON.parse(localStorage.getItem('token_data')) as TokenData;
       this.tokenDataSub.next(td);
     }
 
@@ -139,21 +141,23 @@ export class AuthService {
     };
 
     this.tokenDataSub.next(td);
-    localStorage.setItem('tokenData', JSON.stringify(td));
+    localStorage.setItem('token_data', JSON.stringify(td));
 
     this.setupTokenRefresh();
   }
 
-  clearStoredTokenData(): void {
+  clearStoredAuthData(): void {
     this.tokenDataSub.next(null);
-    localStorage.removeItem('tokenData');
+    localStorage.removeItem('token_data');
+    localStorage.removeItem('code_verifier');
+    localStorage.removeItem('state');
   }
 
   async refreshToken(): Promise<void> {
     let tokenData = this.getStoredTokenData();
 
     if (!tokenData) {
-      throw new Error('Missing tokenData');
+      throw new Error('Missing token_data');
     }
 
     const discoveryDocument = await this.getDiscoveryDocument();
@@ -170,7 +174,7 @@ export class AuthService {
       tokenData = await this.http.post<TokenData>(tokenEndpoint, postData).toPromise();
       this.setStoredTokenData(tokenData);
     } catch {
-      this.clearStoredTokenData();
+      this.clearStoredAuthData();
       await this.requestAuthorizationCode();
     }
   }
