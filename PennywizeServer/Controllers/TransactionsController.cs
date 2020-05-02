@@ -51,10 +51,7 @@ namespace PennywizeServer.Controllers
             transaction.UserId = t.UserId;
             context.Entry(transaction).State = EntityState.Modified;
 
-            try
-            {
-                await context.SaveChangesAsync();
-            }
+            try { await context.SaveChangesAsync(); }
             catch (DbUpdateConcurrencyException)
             {
                 if (!TransactionExists(id)) return NotFound();
