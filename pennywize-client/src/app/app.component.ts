@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { AuthService } from './auth/auth.service';
 
 @Component({
@@ -8,14 +7,28 @@ import { AuthService } from './auth/auth.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  errorMessage: string;
-  subscription = new Subscription();
-  logging = true;
+  state: State = State.Loading;
+
+  get loading() { return this.state == State.Loading; }
+  get logged() { return this.state == State.Logged; }
+  get notLogged() { return this.state == State.NotLogged; }
 
   constructor(private a: AuthService) { }
 
   async ngOnInit() {
-    await this.a.auth();
-    this.logging = false;
+    await this.a.init();
+
+    this.a.idClaims.subscribe(c =>
+      this.state = c ? State.Logged : State.NotLogged
+    );
   }
+
+  login() { this.a.login(); }
+  register() { this.a.login(); }
+}
+
+enum State {
+  Loading,
+  NotLogged,
+  Logged
 }

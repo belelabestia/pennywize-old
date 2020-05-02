@@ -11,8 +11,5 @@ import { Subscription } from 'rxjs';
 export class SettingsComponent {
   constructor(private a: AuthService) { }
 
-  logout() {
-    this.a.logout();
-    this.a.auth();
-  }
+  logout() { this.a.logout(); }
 }

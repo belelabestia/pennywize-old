@@ -1,5 +1,19 @@
-<mat-spinner *ngIf="logging; else app"></mat-spinner>
+<mat-spinner *ngIf="loading"></mat-spinner>
 
-<ng-template #app>
-  <router-outlet></router-outlet>
-</ng-template>
+<ng-container *ngIf="notLogged">
+    <h1>Pennywize</h1>
+    <blockquote>
+        L'ennesima app di finanza personale, by <code>belelabestia</code>
+    </blockquote>
+    <button (click)="login()">Login with google</button>
+    <p>or</p>
+    <div>
+        <input id="agree" type="checkbox">
+        <label for="agree">I agree with T&C and Privacy</label>
+    </div>
+    <button (click)="register()">Register with google</button>
+</ng-container>
+
+<ng-container *ngIf="logged">
+    <router-outlet></router-outlet>
+</ng-container>
