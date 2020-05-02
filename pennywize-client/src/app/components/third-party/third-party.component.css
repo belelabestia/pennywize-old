@@ -1,0 +1,16 @@
+:host {
+    display: block;
+    padding: 16px;
+}
+
+pre {
+    max-height: 200px;
+    max-width: 60%;
+    padding: 8px;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    border: 1px solid lightgrey;
+    border-radius: 4px;
+    background-color: #111;
+    color: whitesmoke;
+}
