@@ -20,7 +20,7 @@ namespace PennywizeServer.Controllers
             var oauthId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
             var oauthIssuer = User.Claims.FirstOrDefault(c => c.Type == "iss").Value;
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.OAuthIssuer == oauthIssuer && u.OAuthId == oauthId);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.OAuthIssuer == oauthIssuer && u.OAuthSubject == oauthId);
 
             if (user == null) return NotFound();
 

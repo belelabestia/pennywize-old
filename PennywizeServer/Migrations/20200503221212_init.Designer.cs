@@ -9,7 +9,7 @@ using PennywizeServer.Models;
 namespace PennywizeServer.Migrations
 {
     [DbContext(typeof(PennywizeContext))]
-    [Migration("20200503020039_init")]
+    [Migration("20200503221212_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,10 +51,10 @@ namespace PennywizeServer.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OAuthId")
+                    b.Property<string>("OAuthIssuer")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("OAuthIssuer")
+                    b.Property<string>("OAuthSubject")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

@@ -11,11 +11,11 @@ namespace PennywizeServer.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [RegisteredUser]
     public class TransactionsController : ControllerBase
     {
         private readonly PennywizeContext context;
-        private string userId => HttpContext.User.Claims.First(c => c.Type == "sub").Value;
-
+        private string userId => (string)HttpContext.Items["user_id"];
         public TransactionsController(PennywizeContext context) => this.context = context;
 
         [HttpGet]
@@ -48,7 +48,7 @@ namespace PennywizeServer.Controllers
             if (t.UserId != userId) return Forbid();
             if (transaction.UserId != null && transaction.UserId != t.UserId) return BadRequest();
 
-            transaction.UserId = t.UserId;
+            transaction.UserId ??= t.UserId;
             context.Entry(transaction).State = EntityState.Modified;
 
             try { await context.SaveChangesAsync(); }

@@ -12,7 +12,7 @@ namespace PennywizeServer.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    OAuthId = table.Column<string>(nullable: true),
+                    OAuthSubject = table.Column<string>(nullable: true),
                     OAuthIssuer = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
