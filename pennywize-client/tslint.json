@@ -85,7 +85,8 @@
     "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true,
     "triple-equals": false,
-    "curly": false
+    "curly": false,
+    "one-line": false
   },
   "rulesDirectory": [
     "codelyzer"
