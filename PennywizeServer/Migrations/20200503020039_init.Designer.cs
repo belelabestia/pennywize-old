@@ -9,7 +9,7 @@ using PennywizeServer.Models;
 namespace PennywizeServer.Migrations
 {
     [DbContext(typeof(PennywizeContext))]
-    [Migration("20200329182307_init")]
+    [Migration("20200503020039_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -18,7 +18,7 @@ namespace PennywizeServer.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.0.1");
 
-            modelBuilder.Entity("PennywizeServer.Transaction", b =>
+            modelBuilder.Entity("PennywizeServer.Models.Transaction", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,32 @@ namespace PennywizeServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("PennywizeServer.Models.User", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OAuthId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OAuthIssuer")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PennywizeServer.Models.Transaction", b =>
+                {
+                    b.HasOne("PennywizeServer.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }

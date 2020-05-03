@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PennywizeServer
+namespace PennywizeServer.Models
 {
     public class Transaction
     {
@@ -12,6 +12,8 @@ namespace PennywizeServer
         public double Amount { get; set; }
         public string Type { get; set; }
         public string Description { get; set; }
+
         public string UserId { get; set; }
+        public User User { get; set; }
     }
 }
