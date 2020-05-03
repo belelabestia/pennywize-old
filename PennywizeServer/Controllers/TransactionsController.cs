@@ -69,10 +69,7 @@ namespace PennywizeServer.Controllers
             transaction.UserId ??= userId;
             context.Transactions.Add(transaction);
 
-            try
-            {
-                await context.SaveChangesAsync();
-            }
+            try { await context.SaveChangesAsync(); }
             catch (DbUpdateException)
             {
                 if (TransactionExists(transaction.Id)) return Conflict();
