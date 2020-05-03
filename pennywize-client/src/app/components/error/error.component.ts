@@ -1,10 +1,11 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'app-error',
   templateUrl: './error.component.html',
-  styleUrls: ['./error.component.css']
+  styleUrls: ['./error.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ErrorComponent {
   constructor(
@@ -12,7 +13,5 @@ export class ErrorComponent {
     @Inject(MAT_DIALOG_DATA) public message: string
   ) { }
 
-  close() {
-    this.d.close();
-  }
+  close() { this.d.close(); }
 }

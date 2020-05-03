@@ -20,13 +20,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   current: Transaction;
   requesting = false;
 
-  get canAdd() {
-    return !this.current;
-  }
-
-  get canEdit() {
-    return !!this.current;
-  }
+  get canAdd() { return !this.current; }
+  get canEdit() { return !!this.current; }
 
   constructor(
     private t: TransactionService,
@@ -43,68 +38,44 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     this.subscription.add(sub);
 
-    try {
-      await this.t.get();
-    } catch {
-      this.d.open(ErrorComponent, { data: 'error loading transactions' });
-    }
+    try { await this.t.get(); }
+    catch { this.d.open(ErrorComponent, { data: 'error loading transactions' }); }
 
     this.bo.observe([Breakpoints.Handset])
       .subscribe(result => this.isMobile = result.matches);
   }
 
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
-  }
-
-  add() {
-    this.current = new Transaction();
-  }
-
-  edit(transaction: Transaction) {
-    this.current = transaction;
-  }
-
-  cancel() {
-    this.current = null;
-  }
+  ngOnDestroy() { this.subscription.unsubscribe(); }
+  add() { this.current = new Transaction(); }
+  edit(transaction: Transaction) { this.current = transaction; }
+  cancel() { this.current = null; }
 
   @HostListener('window:keydown.arrowup', ['$event'])
   editPrev(event: KeyboardEvent) {
     event.preventDefault();
-    if (!this.transactions) {
-      return;
-    }
+
+    if (!this.transactions) return;
 
     const index = this.transactions.indexOf(this.current);
-
-    if (index - 1 >= 0) {
-      this.current = this.transactions[index - 1];
-    }
+    if (index - 1 >= 0) this.current = this.transactions[index - 1];
   }
 
   @HostListener('window:keydown.arrowdown', ['$event'])
   editNext(event: KeyboardEvent) {
     event.preventDefault();
-    if (!this.transactions) {
-      return;
-    }
+    if (!this.transactions) return;
 
     const index = this.transactions.indexOf(this.current);
-
-    if (index + 1 < this.transactions.length) {
-      this.current = this.transactions[index + 1];
-    }
+    if (index + 1 < this.transactions.length) this.current = this.transactions[index + 1];
   }
 
   async save(t: Transaction) {
     this.requesting = true;
     this.current = t;
 
-    const operation = this.current.id ? () => this.put() : () => this.post();
-
     try {
-      await operation();
+      if (this.current.id) await this.put();
+      else await this.post();
     } catch {
       this.d.open(ErrorComponent, { data: 'error saving transaction' });
     } finally {
@@ -118,9 +89,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   async delete() {
     this.requesting = true;
 
-    try {
-      await this.t.delete(this.current);
-    } catch {
+    try { await this.t.delete(this.current); }
+    catch {
       this.d.open(ErrorComponent, { data: 'error deleting transaction' });
     } finally {
       this.cd.markForCheck();
@@ -129,11 +99,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async post() {
-    await this.t.post(this.current);
-  }
-
-  private async put() {
-    await this.t.put(this.current);
-  }
+  private async post() { await this.t.post(this.current); }
+  private async put() { await this.t.put(this.current); }
 }

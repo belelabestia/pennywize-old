@@ -1,15 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-download-personal-data',
   templateUrl: './download-personal-data.component.html',
-  styleUrls: ['./download-personal-data.component.css']
+  styleUrls: ['./download-personal-data.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DownloadPersonalDataComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class DownloadPersonalDataComponent {
 }

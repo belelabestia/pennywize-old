@@ -39,6 +39,7 @@ app-transaction + app-transaction {
     box-sizing: border-box;
     padding: 24px;
     border-left: 1px solid lightgrey;
+    background-color: white;
 }
 
 :host.mobile #edit {

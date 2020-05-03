@@ -1,15 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-third-party',
   templateUrl: './third-party.component.html',
-  styleUrls: ['./third-party.component.css']
+  styleUrls: ['./third-party.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ThirdPartyComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}
+export class ThirdPartyComponent { }

@@ -1,10 +1,11 @@
-import { Component, Input, Output, EventEmitter, HostListener, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, HostListener, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Transaction } from 'src/app/models/transaction';
 
 @Component({
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
-  styleUrls: ['./transaction.component.css']
+  styleUrls: ['./transaction.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionComponent {
   private _isSelected = false;
@@ -13,24 +14,15 @@ export class TransactionComponent {
   @Output() selected = new EventEmitter<void>();
 
   @Input() set isSelected(s: boolean) {
-    if (s) {
-      this.ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-
+    if (s) this.ref.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     this._isSelected = s;
   }
 
-  get isSelected() {
-    return this._isSelected;
-  }
+  get isSelected() { return this._isSelected; }
 
-  get ref(): HTMLElement {
-    return this.el.nativeElement as HTMLElement;
-  }
+  get ref(): HTMLElement { return this.el.nativeElement as HTMLElement; }
 
   constructor(private el: ElementRef) { }
 
-  @HostListener('click') emitSelected() {
-    this.selected.emit();
-  }
+  @HostListener('click') emitSelected() { this.selected.emit(); }
 }

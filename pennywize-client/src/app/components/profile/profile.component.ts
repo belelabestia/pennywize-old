@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Subscription } from 'rxjs';
 import { IdClaims } from 'src/app/auth/interfaces';
@@ -6,7 +6,8 @@ import { IdClaims } from 'src/app/auth/interfaces';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.css']
+  styleUrls: ['./profile.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   claims: IdClaims;
@@ -26,8 +27,5 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.sub.add(sub);
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
-
+  ngOnDestroy() { this.sub.unsubscribe(); }
 }
