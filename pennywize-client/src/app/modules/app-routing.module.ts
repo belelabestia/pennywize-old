@@ -4,42 +4,52 @@ import { TransactionsComponent } from '../components/transactions/transactions.c
 import { SettingsComponent } from '../components/settings/settings.component';
 import { DownloadPersonalDataComponent } from '../components/download-personal-data/download-personal-data.component';
 import { DeleteAccountComponent } from '../components/delete-account/delete-account.component';
-import { PrivacyComponent } from '../components/privacy/privacy.component';
-import { TermsAndConditionsComponent } from '../components/terms-and-conditions/terms-and-conditions.component';
+import { PrivacyComponent } from '../components/legal/privacy/privacy.component';
+import { TermsAndConditionsComponent } from '../components/legal/terms-and-conditions/terms-and-conditions.component';
 import { ThirdPartyComponent } from '../components/third-party/third-party.component';
+import { HomeComponent } from '../components/home/home.component';
+import { AuthGuard } from '../auth/auth.guard';
 
 const routes: Routes = [
   {
-    path: '',
-    component: TransactionsComponent
+    path: 'transactions',
+    component: TransactionsComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'home',
+    component: HomeComponent
   },
   {
     path: 'settings',
-    component: SettingsComponent
+    component: SettingsComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'settings/download-personal-data',
-    component: DownloadPersonalDataComponent
+    component: DownloadPersonalDataComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'settings/delete-account',
-    component: DeleteAccountComponent
+    component: DeleteAccountComponent,
+    canActivate: [AuthGuard]
   },
   {
-    path: 'settings/privacy',
+    path: 'privacy',
     component: PrivacyComponent
   },
   {
-    path: 'settings/terms-and-conditions',
+    path: 'terms-and-conditions',
     component: TermsAndConditionsComponent
   },
   {
-    path: 'settings/third-party',
+    path: 'third-party',
     component: ThirdPartyComponent
   },
   {
     path: '**',
-    redirectTo: '',
+    redirectTo: 'home',
     pathMatch: 'full'
   }
 ];

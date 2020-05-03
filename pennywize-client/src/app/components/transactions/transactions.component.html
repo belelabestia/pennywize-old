@@ -1,5 +1,5 @@
 <div id="content">
-    <app-profile matRipple routerLink="settings"></app-profile>
+    <app-profile matRipple routerLink="/settings"></app-profile>
     <mat-divider></mat-divider>
     <app-transaction *ngFor="let t of transactions" [transaction]="t" (selected)="edit(t)" [isSelected]="current == t"></app-transaction>
     <button class="mat-elevation-z2" mat-fab color="primary" id="add" *ngIf="canAdd" (click)="add()"><mat-icon>add</mat-icon></button>

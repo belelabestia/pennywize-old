@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
-import { IdClaims } from 'src/app/auth/interfaces';
-import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-settings',
@@ -9,7 +8,10 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./settings.component.css']
 })
 export class SettingsComponent {
-  constructor(private a: AuthService) { }
+  constructor(private a: AuthService, private r: Router) { }
 
-  logout() { this.a.logout(); }
+  logout() {
+    this.a.logout();
+    this.r.navigateByUrl('/home');
+  }
 }
