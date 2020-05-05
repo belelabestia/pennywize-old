@@ -19,21 +19,31 @@ export class AuthService {
     @Inject(AUTH_CONF) private authConf: AuthConf
   ) { }
 
-  async init() { await this.auth(false); }
-  async auth(redirect = true): Promise<void> {
-    if (this.getStoredTokenData()) {
-      await this.setupTokenRefresh();
-      return;
-    }
+  auth(): AuthPromise {
+    return new AuthPromise(async (already, just, stop) => {
+      if (this.getStoredTokenData()) {
+        await this.setupTokenRefresh();
+        await already(true);
+        return;
+      }
 
-    const urlParams = this.getUrlParams();
-    const authorizationCode = urlParams.get('code');
+      await already(false);
+      if (stop()) return;
 
-    if (authorizationCode) {
-      await this.validateStateAndRequestToken(urlParams);
-    } else if (redirect) {
+      const urlParams = this.getUrlParams();
+      const authorizationCode = urlParams.get('code');
+
+      if (authorizationCode) {
+        await this.validateStateAndRequestToken(urlParams);
+        await just(true);
+        return;
+      }
+
+      await just(false);
+      if (stop()) return;
+
       await this.requestAuthorizationCode();
-    }
+    });
   }
 
   async getDiscoveryDocument(): Promise<DiscoveryDocument> {
@@ -46,7 +56,6 @@ export class AuthService {
     return this.discoveryDocument;
   }
 
-  async login(): Promise<void> { await this.requestAuthorizationCode(); }
   async requestAuthorizationCode(): Promise<void> {
     const discoveryDocument = await this.getDiscoveryDocument();
     const authorizationEndpoint = discoveryDocument.authorization_endpoint;
@@ -235,5 +244,52 @@ export class AuthService {
     const params = new HttpParams({ fromString: location.search.slice(1) });
     history.replaceState(null, window.name, location.pathname);
     return params;
+  }
+}
+
+type AuthPromiseCallback = (
+  already: (success: boolean) => Promise<void>,
+  just: (success: boolean) => Promise<void>,
+  stop: () => boolean
+) => Promise<void>;
+
+type AuthPromiseLoginCallback = (param: { success: boolean, stop: () => void }) => any | Promise<any>;
+
+export class AuthPromise {
+  private alreadyCallback: AuthPromiseLoginCallback;
+  private justCallback: AuthPromiseLoginCallback;
+  private stop = false;
+  private result = false;
+
+  constructor(private callback: AuthPromiseCallback) { }
+
+  alreadyLogged(callback: AuthPromiseLoginCallback): this {
+    this.alreadyCallback = callback;
+    return this;
+  }
+
+  justLogged(callback: AuthPromiseLoginCallback): this {
+    this.justCallback = callback;
+    return this;
+  }
+
+  async go(): Promise<boolean> {
+    await this.callback(
+      success => this.invokeAlready(success),
+      success => this.invokeJust(success),
+      () => this.stop
+    );
+
+    return this.result;
+  }
+
+  private async invokeAlready(success: boolean): Promise<void> {
+    if (this.alreadyCallback) await this.alreadyCallback({ success, stop: () => this.stop = true });
+    this.result = success;
+  }
+
+  private async invokeJust(success: boolean): Promise<void> {
+    if (this.justCallback) await this.justCallback({ success, stop: () => this.stop = true });
+    this.result = success;
   }
 }

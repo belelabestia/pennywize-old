@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PennywizeServer.Models;
@@ -8,57 +9,52 @@ namespace PennywizeServer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserDataController : ControllerBase
+    [Authorize]
+    [RegisteredUser]
+    public class UserDataController : PennywizeControllerBase
     {
         private readonly PennywizeContext _context;
-
         public UserDataController(PennywizeContext context) => _context = context;
 
         [HttpGet]
         public async Task<ActionResult<UserData>> GetUserData()
         {
-            var oauthId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-            var oauthIssuer = User.Claims.FirstOrDefault(c => c.Type == "iss").Value;
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.OAuthIssuer == oauthIssuer && u.OAuthSubject == oauthId);
-
-            if (user == null) return NotFound();
-
-            var transactions = _context.Transactions.Where(t => t.UserId == user.Id);
+            var transactions = await _context.Transactions
+                .Where(t => t.UserId == PennywizeUser.Id)
+                .ToListAsync();
 
             return new UserData
             {
-                User = user,
+                User = PennywizeUser,
                 Transactions = transactions
             };
         }
 
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        [AllowNonRegistered]
+        public async Task<ActionResult<UserRegistration>> TryRegisterUser()
         {
-            _context.Users.Add(user);
-            
+            if (PennywizeUser.Id != null) return UserRegistration.AlreadyRegistered;
+
+            _context.Users.Add(PennywizeUser);
+
             try { await _context.SaveChangesAsync(); }
             catch (DbUpdateException)
             {
-                if (UserExists(user.Id)) return Conflict();
+                if (UserExists(PennywizeUser.Id)) return Conflict();
                 else throw;
             }
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return UserRegistration.JustRegistered;
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<UserData>> DeleteUserData(string id)
+        [HttpDelete]
+        public async Task<ActionResult<UserData>> DeleteUserData()
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null) return NotFound();
-
-            var transactions = _context.Transactions.Where(t => t.UserId == id);
+            var transactions = _context.Transactions.Where(t => t.UserId == PennywizeUser.Id);
             _context.Transactions.RemoveRange(transactions);
 
-            _context.Users.Remove(user);
+            _context.Users.Remove(PennywizeUser);
             await _context.SaveChangesAsync();
 
             return Ok();

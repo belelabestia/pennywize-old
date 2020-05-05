@@ -29,3 +29,18 @@
         <a routerLink="/privacy">Informativa sulla Privacy</a>
     </p>
 </ng-template>
+
+<ng-template #welcome>
+    <h1 mat-dialog-title>Ciao {{welcomeName}}, benvenuto in Pennywize!</h1>
+    <div mat-dialog-content>
+        <p>
+            Mi chiamo <code>belelabestia</code>, spero ti troverai bene qui.
+        </p>
+        <p>
+            Non esitare a contattarmi per un feedback!
+        </p>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close>Ho capito</button>
+    </div>
+</ng-template>

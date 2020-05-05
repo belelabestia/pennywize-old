@@ -12,17 +12,16 @@ namespace PennywizeServer.Controllers
     [ApiController]
     [Authorize]
     [RegisteredUser]
-    public class TransactionsController : ControllerBase
+    public class TransactionsController : PennywizeControllerBase
     {
         private readonly PennywizeContext context;
-        private string userId => (string)HttpContext.Items["user_id"];
         public TransactionsController(PennywizeContext context) => this.context = context;
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions() =>
             await context.Transactions
-                .Where(t => t.UserId == userId)
-                .ToArrayAsync();
+                .Where(t => t.UserId == PennywizeUser.Id)
+                .ToListAsync();
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Transaction>> GetTransaction(string id)
@@ -30,7 +29,7 @@ namespace PennywizeServer.Controllers
             var transaction = await context.Transactions.FindAsync(id);
 
             if (transaction == null) return NotFound();
-            if (transaction.UserId != userId) return Forbid();
+            if (transaction.UserId != PennywizeUser.Id) return Forbid();
 
             return transaction;
         }
@@ -45,7 +44,7 @@ namespace PennywizeServer.Controllers
                 .FirstOrDefaultAsync(tr => tr.Id == id);
 
             if (t == null) return NotFound();
-            if (t.UserId != userId) return Forbid();
+            if (t.UserId != PennywizeUser.Id) return Forbid();
             if (transaction.UserId != null && transaction.UserId != t.UserId) return BadRequest();
 
             transaction.UserId ??= t.UserId;
@@ -64,9 +63,9 @@ namespace PennywizeServer.Controllers
         [HttpPost]
         public async Task<ActionResult<Transaction>> PostTransaction(Transaction transaction)
         {
-            if (transaction.UserId != null && transaction.UserId != userId) return Forbid();
+            if (transaction.UserId != null && transaction.UserId != PennywizeUser.Id) return Forbid();
 
-            transaction.UserId ??= userId;
+            transaction.UserId ??= PennywizeUser.Id;
             context.Transactions.Add(transaction);
 
             try { await context.SaveChangesAsync(); }
@@ -85,7 +84,7 @@ namespace PennywizeServer.Controllers
             var transaction = await context.Transactions.FindAsync(id);
 
             if (transaction == null) return NotFound();
-            if (transaction.UserId != userId) return Forbid();
+            if (transaction.UserId != PennywizeUser.Id) return Forbid();
 
             context.Transactions.Remove(transaction);
             await context.SaveChangesAsync();

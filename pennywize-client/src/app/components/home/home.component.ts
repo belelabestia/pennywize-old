@@ -1,7 +1,11 @@
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, TemplateRef } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
-import { first } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { MatDialog } from '@angular/material';
+import { first } from 'rxjs/operators';
+
+type UserRegistration = { alreadyRegistered: true } | { justRegistered: true };
 
 @Component({
   selector: 'app-home',
@@ -10,22 +14,48 @@ import { Router } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
+  @ViewChild('welcome', { static: true }) welcome: TemplateRef<any>;
   loading = true;
+  welcomeName: string;
 
   constructor(
     private a: AuthService,
     private r: Router,
     private cd: ChangeDetectorRef,
-    ) { }
+    private h: HttpClient,
+    private d: MatDialog
+  ) { }
 
   async ngOnInit() {
-    await this.a.init();
+    await this.a.auth()
+      .alreadyLogged(({ success }) => {
+        if (success) this.r.navigateByUrl('/transactions');
+      })
+      .justLogged(async ({ success, stop }) => {
+        stop();
+        if (!success) return;
+
+        if (await this.tryRegisterUser()) {
+          const claims = await this.a.idClaims.pipe(first()).toPromise();
+          this.welcomeName = claims.given_name;
+
+          this.d.open(this.welcome, { width: '70%', height: '70%' });
+        }
+
+        this.r.navigateByUrl('/transactions');
+      })
+      .go();
+
     this.cd.markForCheck();
     this.loading = false;
-
-    const claims = await this.a.idClaims.pipe(first()).toPromise();
-    if (claims) this.r.navigateByUrl('/transactions');
   }
 
-  login() { this.a.login(); }
+  login() { this.a.auth().go(); }
+
+  async tryRegisterUser(): Promise<boolean> {
+    const result = await this.h.post<UserRegistration>('api/userdata', null).toPromise();
+    console.log(result);
+
+    return 'justRegistered' in result;
+  }
 }
