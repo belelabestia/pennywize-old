@@ -1,6 +1,6 @@
 namespace PennywizeServer.Models
 {
-    public class UserRegistration
+    public abstract class UserRegistration
     {
         public static UserRegistration JustRegistered => new JustRegisteredUserRegistration();
         public static UserRegistration AlreadyRegistered => new AlreadyRegisteredUserRegistration();

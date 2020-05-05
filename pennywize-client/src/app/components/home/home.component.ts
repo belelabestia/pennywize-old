@@ -39,7 +39,10 @@ export class HomeComponent implements OnInit {
           const claims = await this.a.idClaims.pipe(first()).toPromise();
           this.welcomeName = claims.given_name;
 
-          this.d.open(this.welcome, { width: '70%', height: '70%' });
+          await this.d.open(this.welcome, { width: '70%', height: '70%' })
+            .afterClosed()
+            .toPromise();
+
         }
 
         this.r.navigateByUrl('/transactions');
