@@ -15,7 +15,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   get profile() {
     return {
-      background: `#0000 url('${this.claims.picture})'`,
+      background: `#0000 url('${(this.claims || {}).picture || ''}')`,
       backgroundSize: 'contain'
     };
   }
@@ -23,7 +23,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   constructor(private a: AuthService) { }
 
   ngOnInit() {
-    const sub = this.a.idClaims.subscribe(c => { this.claims = c; });
+    const sub = this.a.idClaims.subscribe(c => this.claims = c);
     this.sub.add(sub);
   }
 

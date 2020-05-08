@@ -3,8 +3,6 @@ import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { Provider, Inject } from '@angular/core';
 import { AuthConf, AUTH_CONF } from './interfaces';
-import { switchMap, first } from 'rxjs/operators';
-
 
 export class TokenInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService, @Inject(AUTH_CONF) private conf: AuthConf) { }

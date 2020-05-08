@@ -42,7 +42,6 @@ export class HomeComponent implements OnInit {
           await this.d.open(this.welcome, { width: '70%', height: '70%' })
             .afterClosed()
             .toPromise();
-
         }
 
         this.r.navigateByUrl('/transactions');
@@ -57,8 +56,6 @@ export class HomeComponent implements OnInit {
 
   async tryRegisterUser(): Promise<boolean> {
     const result = await this.h.post<UserRegistration>('api/userdata', null).toPromise();
-    console.log(result);
-
     return 'justRegistered' in result;
   }
 }
