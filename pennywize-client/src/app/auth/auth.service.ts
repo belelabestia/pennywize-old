@@ -10,9 +10,10 @@ import { map } from 'rxjs/operators';
 export class AuthService {
   discoveryDocument: DiscoveryDocument;
   private tokenDataSub = new BehaviorSubject<TokenData>(undefined);
+  private idClaimsSub = new BehaviorSubject<IdClaims>(undefined);
 
   readonly tokenData = this.tokenDataSub.asObservable();
-  readonly idClaims = this.tokenData.pipe(map(td => this.getIdClaims(td)));
+  readonly idClaims = this.idClaimsSub.asObservable();
 
   constructor(
     private http: HttpClient,
@@ -139,15 +140,28 @@ export class AuthService {
       this.tokenDataSub.next(td);
     }
 
+    this.getStoredIdClaims();
+
     return this.tokenDataSub.value;
+  }
+
+  getStoredIdClaims(): IdClaims {
+    if (!this.idClaimsSub.value) {
+      const claims = JSON.parse(localStorage.getItem('id_claims')) as IdClaims;
+      this.idClaimsSub.next(claims);
+    }
+
+    return this.idClaimsSub.value;
   }
 
   setStoredTokenData(td: TokenData): void {
     td = {
       ...this.getStoredTokenData(),
       ...td,
-      stored_at: '' + new Date().getTime()
+      stored_at: new Date().getTime()
     };
+
+    this.setStoredIdClaims(td);
 
     this.tokenDataSub.next(td);
     localStorage.setItem('token_data', JSON.stringify(td));
@@ -155,11 +169,24 @@ export class AuthService {
     this.setupTokenRefresh();
   }
 
+  setStoredIdClaims(td: TokenData) {
+    const claims = {
+      ...this.getStoredIdClaims(),
+      ...this.getIdClaims(td),
+    };
+
+    this.idClaimsSub.next(claims);
+    localStorage.setItem('id_claims', JSON.stringify(claims));
+  }
+
   clearStoredAuthData(): void {
     this.tokenDataSub.next(null);
+    this.idClaimsSub.next(null);
+
     localStorage.removeItem('token_data');
     localStorage.removeItem('code_verifier');
     localStorage.removeItem('state');
+    localStorage.removeItem('id_claims');
   }
 
   async refreshToken(): Promise<void> {
@@ -195,7 +222,7 @@ export class AuthService {
       throw new Error('Missing refresh data');
     }
 
-    const storedAt = +tokenData.stored_at;
+    const storedAt = tokenData.stored_at;
     const expiresIn = +tokenData.expires_in * 1000;
     const refreshAfter = expiresIn * this.authConf.refreshAfter;
     const refreshAt = storedAt + refreshAfter;

@@ -22,13 +22,13 @@ export interface DiscoveryDocument {
 export interface TokenData {
   access_token?: string;
   token_type?: string;
-  expires_in?: string;
+  expires_in?: number;
   refresh_token?: string;
   id_token?: string;
   scope?: string;
-  stored_at?: string;
+  stored_at?: number;
 
-  [key: string]: string;
+  [key: string]: string | number;
 }
 
 export interface IdClaims {
