@@ -1,11 +1,25 @@
-#form {
-    display: grid;
+:host {
+    display: block;
+    box-sizing: border-box;
     height: 100%;
-    grid-template-rows: 1fr 0fr;
+    padding: 24px 24px 0 24px;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#form::after {
+    content: '';
+    display: block;
+    flex: 0 0 24px;
 }
 
 #buttons {
     text-align: right;
+    margin-top: auto;
 }
 
 #buttons > * {

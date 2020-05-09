@@ -15,7 +15,7 @@
             <mat-error *ngIf="formGroup.controls.type.invalid">Type cannot be empty</mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
-            <input matInput formControlName="description" type="text" placeholder="Description">
+            <textarea matInput formControlName="description" type="text" placeholder="Description"></textarea>
         </mat-form-field>    
     </div>
     <div id="buttons">

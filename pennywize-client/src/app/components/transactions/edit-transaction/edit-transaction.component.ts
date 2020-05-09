@@ -46,6 +46,7 @@ export class EditTransactionComponent {
 
   constructor(private fb: FormBuilder) { }
 
+  @HostListener('window:keyup.control.enter')
   emitSave() {
     if (this.formGroup && this.formGroup.valid) {
       this.save.emit(this.transaction);
@@ -58,25 +59,21 @@ export class EditTransactionComponent {
     this.cancel.emit();
   }
 
-  @HostListener('window:keyup.delete')
-  emitDelete() {
-    if (this.transaction.id) {
-      this.delete.emit();
-    }
+  @HostListener('window:keyup.delete', ['$event.target'])
+  emitDelete(el: Element) {
+    if (el.nodeName == 'TEXTAREA' || el.nodeName == 'INPUT') return;
+    if (!this.transaction.id) return;
+
+    this.delete.emit();
   }
 
   private updateForm(transaction: Transaction, disabled: boolean) {
-    if (!transaction) {
-      return;
-    }
+    if (!transaction) return;
 
     this.formGroup.reset();
     this.formGroup.patchValue(transaction);
 
-    if (disabled) {
-      this.formGroup.disable();
-    } else {
-      this.formGroup.enable();
-    }
+    if (disabled) this.formGroup.disable();
+    else this.formGroup.enable();
   }
 }
