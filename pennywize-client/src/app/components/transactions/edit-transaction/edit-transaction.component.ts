@@ -49,9 +49,8 @@ export class EditTransactionComponent {
   emitSave() {
     if (this.formGroup && this.formGroup.valid) {
       this.save.emit(this.transaction);
+      this.form.resetForm();
     }
-
-    this.form.resetForm();
   }
 
   @HostListener('window:keyup.esc')
