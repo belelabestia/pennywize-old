@@ -50,7 +50,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() { this.subscription.unsubscribe(); }
+
+  @HostListener('window:keyup.alt.n')
   add() { this.current = new Transaction(); }
+
   edit(transaction: Transaction) { this.current = transaction; }
   cancel() { this.current = null; }
 
