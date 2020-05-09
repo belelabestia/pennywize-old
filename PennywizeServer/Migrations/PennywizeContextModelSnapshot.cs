@@ -47,6 +47,7 @@ namespace PennywizeServer.Migrations
             modelBuilder.Entity("PennywizeServer.Models.User", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("OAuthIssuer")
@@ -62,7 +63,7 @@ namespace PennywizeServer.Migrations
 
             modelBuilder.Entity("PennywizeServer.Models.Transaction", b =>
                 {
-                    b.HasOne("PennywizeServer.Models.User", "User")
+                    b.HasOne("PennywizeServer.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId");
                 });
