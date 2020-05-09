@@ -15,9 +15,9 @@
         <mat-card-content>
             <app-profile></app-profile>
             <mat-nav-list>
-                <mat-list-item (click)="logout()">Log out</mat-list-item>
-                <a mat-list-item routerLink="download-personal-data">Download personal data</a>
-                <mat-list-item (click)="deleteAccount()">Delete account</mat-list-item>
+                <mat-list-item (click)="logout()">Esci</mat-list-item>
+                <mat-list-item (click)="downloadData()">Scarica i tuoi dati</mat-list-item>
+                <mat-list-item (click)="deleteAccount()">Elimina account</mat-list-item>
             </mat-nav-list>
         </mat-card-content>
     </mat-card>
@@ -33,8 +33,8 @@
         <mat-card-content>
             <mat-nav-list>
                 <a mat-list-item routerLink="/privacy">Privacy</a>
-                <a mat-list-item routerLink="/terms-and-conditions">Terms & Conditions</a>
-                <a mat-list-item routerLink="/third-party">Third Party</a>
+                <a mat-list-item routerLink="/terms-and-conditions">Termini & Condizioni</a>
+                <a mat-list-item routerLink="/third-party">Terze parti</a>
             </mat-nav-list>
         </mat-card-content>
     </mat-card>
@@ -59,5 +59,17 @@
     </div>
     <div mat-dialog-actions>
         <button mat-raised-button color="primary" mat-dialog-close>Torna alla home</button>
+    </div>
+</ng-template>
+
+<ng-template #downloadDialog>
+    <h1 mat-dialog-title>Attenzione</h1>
+    <div mat-dialog-content>
+        Tutti i tuoi dati verranno esportati in formato JSON.<br>
+        Continuare?
+    </div>
+    <div mat-dialog-actions>
+        <button mat-raised-button color="primary" [mat-dialog-close]="true">Sì</button>
+        <button mat-button [mat-dialog-close]="false" cdkFocusInitial>No</button>
     </div>
 </ng-template>

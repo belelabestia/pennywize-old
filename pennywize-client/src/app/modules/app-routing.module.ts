@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { TransactionsComponent } from '../components/transactions/transactions.component';
 import { SettingsComponent } from '../components/settings/settings.component';
-import { DownloadPersonalDataComponent } from '../components/download-personal-data/download-personal-data.component';
 import { PrivacyComponent } from '../components/legal/privacy/privacy.component';
 import { TermsAndConditionsComponent } from '../components/legal/terms-and-conditions/terms-and-conditions.component';
 import { ThirdPartyComponent } from '../components/third-party/third-party.component';
@@ -34,11 +33,6 @@ const routes: Routes = [
   {
     path: 'settings',
     component: SettingsComponent,
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'settings/download-personal-data',
-    component: DownloadPersonalDataComponent,
     canActivate: [AuthGuard]
   },
   {

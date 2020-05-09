@@ -9,5 +9,8 @@ if (environment.production) {
   enableProdMode();
 }
 
+document.onselectstart = () => false;
+document.oncontextmenu = () => false;
+
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
