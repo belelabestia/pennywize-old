@@ -10,5 +10,6 @@ body {
 
 :root {
     --primary: darkmagenta;
+    --transparent-primary: #8b008b73;
     --secondary: #fffcdc;
 }

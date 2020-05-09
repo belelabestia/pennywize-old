@@ -19,6 +19,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   current: Transaction;
   requesting = false;
+  loading = true;
 
   get canAdd() { return !this.current; }
   get canEdit() { return !!this.current; }
@@ -40,6 +41,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
     try { await this.t.get(); }
     catch { this.d.open(ErrorComponent, { data: 'error loading transactions' }); }
+
+    this.loading = false;
+    this.cd.markForCheck();
 
     this.bo.observe([Breakpoints.Handset])
       .subscribe(result => this.isMobile = result.matches);
