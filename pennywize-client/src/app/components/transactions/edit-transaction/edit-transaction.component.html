@@ -20,7 +20,7 @@
     </div>
     <div id="buttons">
         <button type="submit" mat-raised-button color="primary" [disabled]="disabled">Save</button>
-        <button mat-raised-button color="warn" (click)="emitDelete()" *ngIf="canDelete" [disabled]="disabled">Delete</button>
+        <button mat-raised-button color="warn" (click)="emitDelete($event.target)" *ngIf="canDelete" [disabled]="disabled">Delete</button>
         <button mat-stroked-button (click)="emitCancel()" [disabled]="disabled">Cancel</button>
     </div>
 </form>
