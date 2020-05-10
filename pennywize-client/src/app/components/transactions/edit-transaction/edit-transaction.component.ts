@@ -61,7 +61,12 @@ export class EditTransactionComponent {
 
   @HostListener('window:keyup.delete', ['$event.target'])
   emitDelete(el: Element) {
-    if (el.nodeName == 'TEXTAREA' || el.nodeName == 'INPUT') return;
+    if (
+      el &&
+      el.nodeName == 'TEXTAREA' ||
+      el.nodeName == 'INPUT'
+    ) return;
+
     if (!this.transaction.id) return;
 
     this.delete.emit();
