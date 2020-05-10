@@ -38,6 +38,5 @@ jobs:
       run: |
         cd pennywize-client
         npm install
-        echo 'npm install: fatto'
+        npm -g install @angular/cli
         ng build --prod
-        echo 'ng build --prod: fatto'
