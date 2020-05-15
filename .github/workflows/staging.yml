@@ -28,9 +28,9 @@ jobs:
     - name: deploy backend
       working-directory: PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
       env:
-      - SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
-      - SSHPASS: ${{ secrets.SSH_PASSWORD }}
-      - BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
+        SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
+        SSHPASS: ${{ secrets.SSH_PASSWORD }}
+        BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
       run: sshpass -e scp -r * $SSH_LOGIN:/$BACKEND_PATH
 
   deploy-frontend:
