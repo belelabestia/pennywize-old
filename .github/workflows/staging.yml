@@ -29,7 +29,7 @@ jobs:
     - name: deploy backend
       run: |
         cd PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
-        echo ${{ secrets.TEST_SECRET }}
+        echo something_beautiful
 
 
   deploy-frontend:
