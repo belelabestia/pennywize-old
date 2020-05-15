@@ -31,7 +31,7 @@ jobs:
         SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
         BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
-      run: sshpass -e scp -r * $SSH_LOGIN:/$BACKEND_PATH
+      run: sshpass -e scp -o StrictHostKeyChecking=no -r * $SSH_LOGIN:/$BACKEND_PATH
 
   deploy-frontend:
     runs-on: ubuntu-latest
