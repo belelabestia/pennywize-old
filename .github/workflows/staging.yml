@@ -25,13 +25,19 @@ jobs:
       working-directory: PennywizeServer
       run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishTrimmed=true -p:PublishSingleFile=true
 
+    - name: clear current files
+      run: sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf /var/www/pwz/backend/*
+
     - name: deploy backend
       working-directory: PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
       env:
         SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
         SSHPASS: ${{ secrets.SSH_PASSWORD }}
         BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
-      run: sshpass -e scp -o StrictHostKeyChecking=no -r * $SSH_LOGIN:$BACKEND_PATH
+      run: sshpass -e scp -r * $SSH_LOGIN:$BACKEND_PATH
+
+    - name: restart service
+      run: sshpass -e ssh $SSH_LOGIN systemctl restart kestrel-pwz.service
 
   deploy-frontend:
     runs-on: ubuntu-latest
@@ -45,8 +51,8 @@ jobs:
         node-version: 10.x
 
     - name: build frontend
+      working-directory: pennywize-client
       run: |
-        cd pennywize-client
         npm install
         npm -g install @angular/cli
         ng build --prod
