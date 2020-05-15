@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    # branches: [ master ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -22,15 +22,16 @@ jobs:
       run: sudo apt install -qy sshpass
 
     - name: build backend
-      run: |
-        cd PennywizeServer
-        dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishTrimmed=true -p:PublishSingleFile=true
+      working-directory: PennywizeServer
+      run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishTrimmed=true -p:PublishSingleFile=true
 
     - name: deploy backend
-      run: |
-        cd bin/Release/netcoreapp3.0/linux-x64/publish/
-        echo something_beautiful
-
+      working-directory: PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
+      env:
+      - SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
+      - SSHPASS: ${{ secrets.SSH_PASSWORD }}
+      - BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
+      run: sshpass -e scp -r * $SSH_LOGIN:/$BACKEND_PATH
 
   deploy-frontend:
     runs-on: ubuntu-latest
