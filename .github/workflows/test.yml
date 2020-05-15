@@ -16,3 +16,8 @@ jobs:
 
     - name: echo some secret
       run: echo '${{ secrets.TEST_SECRET }}'
+
+    - name: echo some secret as env
+      env:
+        test_secret: ${{ secrets.TEST_SECRET }}
+      run: echo '$test_secret'
