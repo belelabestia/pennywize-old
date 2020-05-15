@@ -15,4 +15,4 @@ jobs:
       run: echo blablabla
 
     - name: echo some secret
-      run: echo ${{ secrets.TEST_SECRET }}
+      run: echo '${{ secrets.TEST_SECRET }}'
