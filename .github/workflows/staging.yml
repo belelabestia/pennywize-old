@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 3.1.101
 
     - name: setup sshpass
-      run: apt install -qy sshpass
+      run: sudo apt install -qy sshpass
 
     - name: build backend
       run: |
