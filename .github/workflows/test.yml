@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: echo something
-    - run: echo blablabla
+      run: echo blablabla
 
     - name: echo some secret
-    - run: echo ${{ secrets.TEST_SECRET }}
+      run: echo ${{ secrets.TEST_SECRET }}
