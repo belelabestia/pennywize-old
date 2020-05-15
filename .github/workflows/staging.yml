@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-backend:
+  deploy-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,12 +18,21 @@ jobs:
       with:
         dotnet-version: 3.1.101
 
+    - name: setup sshpass
+      run: apt install -qy sshpass
+
     - name: build backend
       run: |
         cd PennywizeServer
         dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishTrimmed=true -p:PublishSingleFile=true
 
-  build-frontend:
+    - name: deploy backend
+      run: |
+        cd PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
+        echo ${{ secrets.TEST_SECRET }}
+
+
+  deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
