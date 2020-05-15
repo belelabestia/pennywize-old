@@ -75,7 +75,7 @@ namespace PennywizeServer.Controllers
                 else throw;
             }
 
-            return CreatedAtAction("GetTransaction", new { id = transaction.Id }, transaction);
+            return CreatedAtAction("GetTransaction", new { id = transaction.Id }, new { Id = transaction.Id, UserId = transaction.UserId });
         }
 
         [HttpDelete("{id}")]
