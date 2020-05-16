@@ -6,7 +6,7 @@ on:
 
 defaults:
   run:
-    shell: /bin/bash -eu {0}
+    shell: /bin/bash -eu
 
 jobs:
   test-unbound-variable:
