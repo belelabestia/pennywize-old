@@ -5,7 +5,8 @@ on:
     branches: [ actions-test ]
 
 defaults:
-  shell: bash -eu
+  run:
+    shell: bash -eu
 
 jobs:
   test-unbound-variable:
