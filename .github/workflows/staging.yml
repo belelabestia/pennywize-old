@@ -12,6 +12,10 @@ env:
   BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
   # FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
 
+defaults:
+  run:
+    shell: bash -eu
+
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
@@ -23,9 +27,6 @@ jobs:
       uses: actions/setup-dotnet@v1.4.0
       with:
         dotnet-version: 3.1.101
-
-    - name: refuse errors and undefined variables
-      run: set -eu
 
     - name: setup sshpass
       run: sudo apt install -qy sshpass
@@ -54,9 +55,6 @@ jobs:
       uses: actions/setup-node@v1.4.2
       with:
         node-version: 10.x
-
-    - name: refuse errors and undefined variables
-      run: set -eu
 
     - name: setup sshpass
       run: sudo apt install -qy sshpass
