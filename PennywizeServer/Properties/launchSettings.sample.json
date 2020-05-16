@@ -5,6 +5,7 @@
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "URLS": "http://localhost:5002",
         "login_authority": "blabla",
         "login_audience": "blablabla",
         "ConnectionStrings__database": "blablabla"

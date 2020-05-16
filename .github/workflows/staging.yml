@@ -51,9 +51,21 @@ jobs:
       with:
         node-version: 10.x
 
+    - name: setup sshpass
+      run: sudo apt install -qy sshpass
+
+    - name: setup angular cli
+      run: npm -g install @angular/cli
+
     - name: build frontend
       working-directory: pennywize-client
       run: |
         npm install
-        npm -g install @angular/cli
         ng build --prod
+
+    - name: clear current files
+      run: sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf /var/www/pwz/frontend/*
+
+    - name: deploy frontend
+      working-directory: pennywize-client/dist
+      run: sshpass -e scp -r * $SSH_LOGIN:$FRONTEND_PATH
