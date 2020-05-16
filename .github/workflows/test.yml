@@ -4,6 +4,9 @@ on:
   push:
     branches: [ actions-test ]
 
+defaults:
+  shell: bash -eu
+
 jobs:
   test-unbound-variable:
     runs-on: ubuntu-latest
@@ -11,7 +14,6 @@ jobs:
     steps:
     - name: let's see if throws
       run: |
-        set -eu
         echo something
         echo $NONEXISTING_VAR
         echo something else
