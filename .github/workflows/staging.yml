@@ -12,10 +12,6 @@ env:
   BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
   # FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
 
-defaults:
-  run:
-    shell: bash -eu
-
 jobs:
   deploy-backend:
     runs-on: ubuntu-latest
@@ -36,11 +32,15 @@ jobs:
       run: dotnet publish -c Release -r linux-x64 --self-contained true -p:PublishTrimmed=true -p:PublishSingleFile=true
 
     - name: clear current files
-      run: sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf $BACKEND_PATH/*
+      run: |
+        set -eu
+        sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf $BACKEND_PATH/*
 
     - name: deploy backend
       working-directory: PennywizeServer/bin/Release/netcoreapp3.0/linux-x64/publish/
-      run: sshpass -e scp -r * $SSH_LOGIN:$BACKEND_PATH
+      run: |
+        set -eu
+        sshpass -e scp -r * $SSH_LOGIN:$BACKEND_PATH
 
     - name: restart service
       run: sshpass -e ssh $SSH_LOGIN systemctl restart kestrel-pwz.service
@@ -69,8 +69,12 @@ jobs:
         ng build --prod
 
     - name: clear current files
-      run: sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf $FRONTEND_PATH/*
+      run: |
+        set -eu
+        sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf $FRONTEND_PATH/*
 
     - name: deploy frontend
       working-directory: pennywize-client/dist/pennywize-client
-      run: sshpass -e scp -r * $SSH_LOGIN:$FRONTEND_PATH
+      run: |
+        set -eu
+        sshpass -e scp -r * $SSH_LOGIN:$FRONTEND_PATH
