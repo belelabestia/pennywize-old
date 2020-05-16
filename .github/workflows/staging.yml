@@ -10,7 +10,7 @@ env:
   SSH_LOGIN: ${{ secrets.SSH_LOGIN }}
   SSHPASS: ${{ secrets.SSH_PASSWORD }}
   BACKEND_PATH: ${{ secrets.BACKEND_PATH }}
-  # FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
+  FRONTEND_PATH: ${{ secrets.FRONTEND_PATH }}
 
 jobs:
   deploy-backend:
