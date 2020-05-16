@@ -67,5 +67,5 @@ jobs:
       run: sshpass -e ssh -o StrictHostKeyChecking=no $SSH_LOGIN rm -rf /var/www/pwz/frontend/*
 
     - name: deploy frontend
-      working-directory: pennywize-client/dist
+      working-directory: pennywize-client/dist/pennywize-client
       run: sshpass -e scp -r * $SSH_LOGIN:$FRONTEND_PATH
