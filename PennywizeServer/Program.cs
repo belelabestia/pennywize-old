@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,9 @@ namespace PennywizeServer
 
         public static void DbInit(IHost host)
         {
+            var connstr = Environment.GetEnvironmentVariable("ASPNETCORE__ConnectionStrings__database");
+            Console.WriteLine(connstr);
+
             using var scope = host.Services.CreateScope();
             scope
                 .ServiceProvider
