@@ -1,7 +1,5 @@
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PennywizeServer.Models;
@@ -19,14 +17,10 @@ namespace PennywizeServer
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(conf => conf.AddEnvironmentVariables())
                 .ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
 
         public static void DbInit(IHost host)
         {
-            var connstr = Environment.GetEnvironmentVariable("ASPNETCORE__ConnectionStrings__database");
-            Console.WriteLine(connstr);
-
             using var scope = host.Services.CreateScope();
             scope
                 .ServiceProvider

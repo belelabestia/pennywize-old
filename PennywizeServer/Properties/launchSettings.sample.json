@@ -7,7 +7,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "login_authority": "blabla",
         "login_audience": "blablabla",
-        "ASPNETCORE__ConnectionStrings__database": "blablabla"
+        "ConnectionStrings__database": "blablabla"
       }
     }
   }
