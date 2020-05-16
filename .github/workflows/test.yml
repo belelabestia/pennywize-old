@@ -5,22 +5,13 @@ on:
     branches: [ actions-test ]
 
 jobs:
-  test-deploy:
+  test-unbound-variable:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-
-    - name: echo something
+    - name: let's see if throws
       run: |
-        echo blablabla
-
-    - name: echo some secret
-      run: |
-        echo '${{ secrets.TEST_SECRET }}'
-
-    - name: echo some secret as env
-      env:
-        test_secret: ${{ secrets.TEST_SECRET }}
-      run: |
-        echo $test_secret
+        set -eu
+        echo something
+        echo $NONEXISTING_VAR
+        echo something else
