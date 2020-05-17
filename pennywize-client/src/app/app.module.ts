@@ -49,8 +49,6 @@ registerLocaleData(localeIt);
     authProviders(authConf),
   ],
   bootstrap: [AppComponent],
-  entryComponents: [
-    ErrorComponent
-  ]
+  entryComponents: [ErrorComponent]
 })
 export class AppModule { }

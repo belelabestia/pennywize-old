@@ -2,9 +2,11 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, HostBind
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
-import { Subscription } from 'rxjs';
+import { Subscription, combineLatest, SubscriptionLike } from 'rxjs';
 import { MatDialog } from '@angular/material';
 import { ErrorComponent } from '../error/error.component';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-transactions',
@@ -28,12 +30,34 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private t: TransactionService,
     private cd: ChangeDetectorRef,
     private bo: BreakpointObserver,
-    private d: MatDialog
+    private d: MatDialog,
+    private r: Router,
+    private a: ActivatedRoute,
+    private l: Location
   ) { }
 
   async ngOnInit() {
-    const sub = this.t.transactions.subscribe(tt => {
+    let sub: SubscriptionLike;
+
+    sub = this.l.subscribe(() => this.l.go('/transactions'));
+    this.subscription.add(sub);
+
+    sub = combineLatest(
+      this.t.transactions,
+      this.a.paramMap
+    ).subscribe(([tt, p]) => {
       this.transactions = tt;
+
+      const id = p.get('id');
+      this.current = id ?
+        id == 'new' ?
+          new Transaction() :
+          this.transactions.find(t => t.id == id) :
+        null;
+
+      this.l.go('/transactions');
+      if (id) this.l.go(`/transactions/${id}`);
+
       this.cd.detectChanges();
     });
 
@@ -49,13 +73,11 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .subscribe(result => this.isMobile = result.matches);
   }
 
-  ngOnDestroy() { this.subscription.unsubscribe(); }
-
   @HostListener('window:keyup.alt.n')
-  add() { this.current = new Transaction(); }
+  add() { this.r.navigateByUrl('/transactions/new'); }
 
-  edit(transaction: Transaction) { this.current = transaction; }
-  cancel() { this.current = null; }
+  edit(transaction: Transaction) { this.r.navigateByUrl(`/transactions/${transaction.id}`); }
+  cancel() { this.r.navigateByUrl('/transactions'); }
 
   @HostListener('window:keydown.arrowup', ['$event'])
   editPrev(event: KeyboardEvent) {
@@ -64,7 +86,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     if (!this.transactions) return;
 
     const index = this.transactions.indexOf(this.current);
-    if (index - 1 >= 0) this.current = this.transactions[index - 1];
+    if (index - 1 >= 0) this.r.navigateByUrl(`/transactions/${this.transactions[index - 1].id}`);
   }
 
   @HostListener('window:keydown.arrowdown', ['$event'])
@@ -73,7 +95,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     if (!this.transactions) return;
 
     const index = this.transactions.indexOf(this.current);
-    if (index + 1 < this.transactions.length) this.current = this.transactions[index + 1];
+    if (index + 1 < this.transactions.length) this.r.navigateByUrl(`/transactions/${this.transactions[index + 1].id}`);
   }
 
   async save(t: Transaction) {
@@ -108,4 +130,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   private async post() { await this.t.post(this.current); }
   private async put() { await this.t.put(this.current); }
+
+  ngOnDestroy() { this.subscription.unsubscribe(); }
 }

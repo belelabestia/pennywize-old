@@ -26,7 +26,12 @@ const routes: Routes = [
     component: ThirdPartyComponent
   },
   {
-    path: 'transactions',
+    matcher: ([transactions, id]) =>
+      transactions && transactions.path == 'transactions' ?
+        id ?
+          { consumed: [transactions, id], posParams: { id } } :
+          { consumed: [transactions] } :
+        null,
     component: TransactionsComponent,
     canActivate: [AuthGuard]
   },
