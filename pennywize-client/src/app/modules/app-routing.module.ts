@@ -8,7 +8,7 @@ import { ThirdPartyComponent } from '../components/third-party/third-party.compo
 import { HomeComponent } from '../components/home/home.component';
 import { AuthGuard } from '../auth/auth.guard';
 
-function matchTransactions([transactions, id]: UrlSegment[]): UrlMatchResult {
+export function matchTransactions([transactions, id]: UrlSegment[]): UrlMatchResult {
   return transactions && transactions.path == 'transactions' ?
     id ?
       { consumed: [transactions, id], posParams: { id } } :
