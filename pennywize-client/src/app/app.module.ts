@@ -20,6 +20,8 @@ import { PrivacyComponent } from './components/legal/privacy/privacy.component';
 import { TermsAndConditionsComponent } from './components/legal/terms-and-conditions/terms-and-conditions.component';
 import { ThirdPartyComponent } from './components/third-party/third-party.component';
 import { HomeComponent } from './components/home/home.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 registerLocaleData(localeIt);
 
@@ -43,7 +45,8 @@ registerLocaleData(localeIt);
     HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
+    ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     authProviders(authConf),
