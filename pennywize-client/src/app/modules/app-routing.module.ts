@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, UrlSegment, UrlMatchResult } from '@angular/router';
 import { TransactionsComponent } from '../components/transactions/transactions.component';
 import { SettingsComponent } from '../components/settings/settings.component';
 import { PrivacyComponent } from '../components/legal/privacy/privacy.component';
@@ -7,6 +7,14 @@ import { TermsAndConditionsComponent } from '../components/legal/terms-and-condi
 import { ThirdPartyComponent } from '../components/third-party/third-party.component';
 import { HomeComponent } from '../components/home/home.component';
 import { AuthGuard } from '../auth/auth.guard';
+
+function matchTransactions([transactions, id]: UrlSegment[]): UrlMatchResult {
+  return transactions && transactions.path == 'transactions' ?
+    id ?
+      { consumed: [transactions, id], posParams: { id } } :
+      { consumed: [transactions] } :
+    null;
+}
 
 const routes: Routes = [
   {
@@ -26,13 +34,7 @@ const routes: Routes = [
     component: ThirdPartyComponent
   },
   {
-    matcher([transactions, id]) {
-      return transactions && transactions.path == 'transactions' ?
-        id ?
-          { consumed: [transactions, id], posParams: { id } } :
-          { consumed: [transactions] } :
-        null;
-    },
+    matcher: matchTransactions,
     component: TransactionsComponent,
     canActivate: [AuthGuard]
   },
