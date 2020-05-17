@@ -43,7 +43,7 @@ app-transaction + app-transaction {
 }
 
 :host.mobile #edit {
-    flex: 0 0 150px;
+    flex: 0 0 460px;
     border-left: none;
     border-top: 1px solid lightgrey;
 }
