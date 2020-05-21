@@ -1,0 +1,39 @@
+.profile {
+    background-color: #ececec;
+}
+
+.profile-pic {
+    background-size: cover;
+    z-index: 1;
+}
+
+mat-icon {
+    float: left;
+    margin-right: 5px;
+}
+
+.fallback-profile-pic {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 50%;
+    color: grey;
+}
+
+.fallback-profile-pic::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 6px solid white;
+    box-sizing: border-box;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.fallback-profile-pic > * {
+    font-size: 40px;
+}

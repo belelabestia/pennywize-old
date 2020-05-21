@@ -1,0 +1,78 @@
+:host {
+    display: block;
+}
+
+mat-card.selected::before {
+    display: block;
+    content: "";
+    width: 4px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-top-left-radius: 2px;
+    border-bottom-left-radius: 2px;
+    background-color: var(--primary);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.amount {
+    font-size: 20px;
+    font-weight: bold;
+    grid-row: span 2;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+}
+
+.amount::after {
+    margin-left: 2px;
+    content: '€';
+}
+
+.amount.in {
+    color: var(--green);
+}
+
+.amount.out {
+    color: var(--red);
+}
+
+.type {
+    font-family: 'Roboto Mono', monospace;
+    text-align: right;
+    color: var(--primary);
+    font-size: 16px;
+}
+
+.type > * {
+    display: inline-block;
+    background-color: var(--secondary);
+    padding: 0 4px;
+    border-top-left-radius: 4px 2px;
+    border-top-right-radius: 4px 2px;
+    border-bottom-right-radius: 4px 2px;
+    border-bottom-left-radius: 4px 2px;
+    border: 1px solid lightgray;
+}
+
+.date {
+    font-size: 12px;
+    text-align: right;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.description {
+    color: var(--transparent-primary);
+    grid-column: span 2;
+    margin-top: 8px;
+    padding-top: 4px;
+    border-top: 1px solid var(--primary);
+    max-height: 62px;
+    overflow-y: auto;
+}

@@ -1,0 +1,46 @@
+<div class="loading" *ngIf="loading; else home">
+    <mat-spinner></mat-spinner>
+</div>
+
+<ng-template #home>
+    <div class="header">
+        <mat-card>
+            <h1 mat-card-title>Pennywize</h1>
+            <mat-card-content>
+                <p>
+                    L'ennesima app di finanza personale,<br>
+                    by <code>belelabestia</code>
+                </p>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <mat-card class="content">
+        <h4>Entra o registrati con</h4>
+
+        <button mat-raised-button (click)="login()">
+            <div>
+                <img src="assets/login/google.svg" alt="google">
+                Google
+            </div>
+        </button>
+    </mat-card>
+    <p class="legal">
+        Accedendo accetti i <a routerLink="/terms-and-conditions">Termini e condizioni</a> e l'
+        <a routerLink="/privacy">Informativa sulla Privacy</a>
+    </p>
+</ng-template>
+
+<ng-template #welcome>
+    <h1 mat-dialog-title>Ciao {{welcomeName}}, benvenuto in Pennywize!</h1>
+    <div mat-dialog-content>
+        <p>
+            Mi chiamo <code>belelabestia</code>, spero ti troverai bene qui.
+        </p>
+        <p>
+            Non esitare a contattarmi per un feedback!
+        </p>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-button mat-dialog-close>Ho capito</button>
+    </div>
+</ng-template>

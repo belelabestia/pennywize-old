@@ -1,0 +1,26 @@
+<form id="form" [formGroup]="formGroup" (ngSubmit)="emitSave()">
+    <div id="fields">
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="date" [matDatepicker]="picker" placeholder="Date">
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="formGroup.controls.date.invalid">Date cannot be empty</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="amount" type="number" placeholder="Amount">
+            <mat-error *ngIf="formGroup.controls.amount.invalid">Amount cannot be empty</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <input matInput formControlName="type" type="text" placeholder="Type">
+            <mat-error *ngIf="formGroup.controls.type.invalid">Type cannot be empty</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+            <textarea matInput formControlName="description" type="text" placeholder="Description"></textarea>
+        </mat-form-field>    
+    </div>
+    <div id="buttons">
+        <button type="submit" mat-raised-button color="primary" [disabled]="disabled">Save</button>
+        <button mat-raised-button color="warn" (click)="emitDelete($event.target)" *ngIf="canDelete" [disabled]="disabled">Delete</button>
+        <button mat-stroked-button (click)="emitCancel()" [disabled]="disabled">Cancel</button>
+    </div>
+</form>

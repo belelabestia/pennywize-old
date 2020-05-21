@@ -1,0 +1,32 @@
+:host {
+    display: block;
+    padding: 24px;
+}
+
+mat-card + mat-card {
+    margin-top: 5px;
+}
+
+.main-title {
+    margin-left: -16px;
+}
+
+mat-icon {
+    float: left;
+    margin-right: 5px;
+}
+
+.red {
+    color: #f44336;
+}
+
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

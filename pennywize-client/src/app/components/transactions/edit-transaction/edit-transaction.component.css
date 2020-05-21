@@ -1,0 +1,35 @@
+:host {
+    display: block;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 24px 24px 0 24px;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#form::after {
+    content: '';
+    display: block;
+    flex: 0 0 24px;
+}
+
+#buttons {
+    text-align: right;
+    margin-top: auto;
+}
+
+#buttons > * {
+    width: 80px;
+}
+
+#buttons > *:not(:last-child) {
+    margin-right: 6px;
+}
+
+#fields > * {
+    width: 100%;
+}

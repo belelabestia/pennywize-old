@@ -1,0 +1,102 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@import '~@angular/material/theming';
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat-core();
+
+$pwz-primary: (
+    50: var(--primary),
+    100: var(--primary),
+    200: var(--primary),
+    300: var(--primary),
+    400: var(--primary),
+    500: var(--primary),
+    600: var(--primary),
+    700: var(--primary),
+    800: var(--primary),
+    900: var(--primary),
+    A100: var(--primary),
+    A200: var(--primary),
+    A400: var(--primary),
+    A700: var(--primary),
+    contrast: (
+        50: $light-primary-text,
+        100: $light-primary-text,
+        200: $light-primary-text,
+        300: $light-primary-text,
+        400: $light-primary-text,
+        500: $light-primary-text,
+        600: $light-primary-text,
+        700: $light-primary-text,
+        800: $light-primary-text,
+        900: $light-primary-text,
+        A100: $light-primary-text,
+        A200: $light-primary-text,
+        A400: $light-primary-text,
+        A700: $light-primary-text,
+    )
+);
+
+$pwz-secondary: (
+    50: var(--secondary),
+    100: var(--secondary),
+    200: var(--secondary),
+    300: var(--secondary),
+    400: var(--secondary),
+    500: var(--secondary),
+    600: var(--secondary),
+    700: var(--secondary),
+    800: var(--secondary),
+    900: var(--secondary),
+    A100: var(--secondary),
+    A200: var(--secondary),
+    A400: var(--secondary),
+    A700: var(--secondary),
+    contrast: (
+        50: $dark-primary-text,
+        100: $dark-primary-text,
+        200: $dark-primary-text,
+        300: $dark-primary-text,
+        400: $dark-primary-text,
+        500: $dark-primary-text,
+        600: $dark-primary-text,
+        700: $dark-primary-text,
+        800: $dark-primary-text,
+        900: $dark-primary-text,
+        A100: $dark-primary-text,
+        A200: $dark-primary-text,
+        A400: $dark-primary-text,
+        A700: $dark-primary-text,
+    )
+);
+
+// Define the palettes for your theme using the Material Design palettes available in palette.scss
+// (imported above). For each palette, you can optionally specify a default, lighter, and darker
+// hue. Available color palettes: https://material.io/design/color/
+$pennywize-client-primary: mat-palette($pwz-primary);
+$pennywize-client-accent: mat-palette($pwz-secondary);
+
+// The warn palette is optional (defaults to red).
+$pennywize-client-warn: mat-palette($mat-red);
+
+// Create the theme object (a Sass map containing all of the palettes).
+$pennywize-client-theme: mat-light-theme($pennywize-client-primary, $pennywize-client-accent, $pennywize-client-warn);
+
+// Include theme styles for core and each component used in your app.
+// Alternatively, you can import and @include the theme mixins for each component
+// that you are using.
+@include angular-material-theme($pennywize-client-theme);
+
+.mat-card:not([class*=mat-elevation-z]) {
+    border: 1px solid lightgrey;
+    box-shadow: none;
+}
+
+body .mat-card-subtitle {
+    margin-bottom: 0;
+}

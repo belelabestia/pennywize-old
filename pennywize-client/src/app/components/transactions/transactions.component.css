@@ -1,0 +1,72 @@
+:host {
+    height: 100%;
+    display: flex;
+    position: relative;
+}
+
+:host.mobile {
+    flex-direction: column;
+}
+
+#content {
+    flex: 1 1 auto;
+    height: 100%;
+    overflow: auto;
+    box-sizing: border-box;
+    padding: 24px;
+}
+
+app-profile {
+    display: block;
+}
+
+mat-divider {
+    margin: 16px 0;
+}
+
+app-transaction + app-transaction {
+    margin-top: 5px;
+}
+
+#add {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+}
+
+#edit {
+    flex: 0 0 350px;
+    box-sizing: border-box;
+    border-left: 1px solid lightgrey;
+    background-color: white;
+    overflow-y: auto;
+}
+
+:host.mobile #edit {
+    flex: 0 0 460px;
+    border-left: none;
+    border-top: 1px solid lightgrey;
+}
+
+.placeholder {
+    padding: 0 16px;
+    cursor: pointer;
+    font-size: 32px;
+    color: var(--transparent-primary);
+}
+
+.create-tip {
+    font-size: 42px;
+    text-decoration: underline;
+}
+
+.loading {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

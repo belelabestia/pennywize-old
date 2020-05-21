@@ -1,0 +1,10 @@
+<mat-card [class.selected]="isSelected">
+    <div class="grid">
+        <div class="amount" [ngClass]="type">{{transaction.amount}}</div>
+        <div class="type">
+            <div>{{transaction.type}}</div>
+        </div>
+        <div class="date">{{transaction.date | date: 'shortDate' }}</div>
+        <div class="description" *ngIf="transaction.description">{{transaction.description}}</div>
+    </div>
+</mat-card>
