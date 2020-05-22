@@ -3,7 +3,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Transaction } from 'src/app/models/transaction';
 import { TransactionService } from 'src/app/services/transaction.service';
 import { Subscription, combineLatest, SubscriptionLike } from 'rxjs';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ErrorComponent } from '../error/error.component';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
@@ -42,10 +42,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     sub = this.l.subscribe(() => this.l.go('/transactions'));
     this.subscription.add(sub);
 
-    sub = combineLatest(
+    sub = combineLatest([
       this.t.transactions,
       this.a.paramMap
-    ).subscribe(([tt, p]) => {
+    ]).subscribe(([tt, p]) => {
       this.transactions = tt;
 
       const id = p.get('id');

@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators, FormGroupDirective, NgForm } from '
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditTransactionComponent {
-  @ViewChild(FormGroupDirective, { static: true }) form: NgForm;
+  @ViewChild(FormGroupDirective) form: NgForm;
 
   formGroup = this.fb.group({
     id: [undefined],

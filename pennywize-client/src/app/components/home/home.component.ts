@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChil
 import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs/operators';
 
 type UserRegistration = { alreadyRegistered: true } | { justRegistered: true };
@@ -14,7 +14,7 @@ type UserRegistration = { alreadyRegistered: true } | { justRegistered: true };
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('welcome', { static: true }) welcome: TemplateRef<any>;
+  @ViewChild('welcome') welcome: TemplateRef<any>;
   loading = true;
   welcomeName: string;
 

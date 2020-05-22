@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, TemplateRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AuthService } from 'src/app/auth/auth.service';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -11,9 +11,9 @@ import { HttpClient } from '@angular/common/http';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SettingsComponent {
-  @ViewChild('deleteDialog', { static: true }) deleteDialog: TemplateRef<any>;
-  @ViewChild('accountDeletedDialog', { static: true }) accountDeletedDialog: TemplateRef<any>;
-  @ViewChild('downloadDialog', { static: true }) downloadDialog: TemplateRef<any>;
+  @ViewChild('deleteDialog') deleteDialog: TemplateRef<any>;
+  @ViewChild('accountDeletedDialog') accountDeletedDialog: TemplateRef<any>;
+  @ViewChild('downloadDialog') downloadDialog: TemplateRef<any>;
   loading = false;
 
   constructor(
