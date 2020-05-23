@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -7,17 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  @ViewChild('install') install: TemplateRef<any>;
-
-  constructor(private d: MatDialog) { }
-
   ngOnInit() {
-    window.addEventListener('beforeinstallprompt', async (e: any) => {
-      console.log(e);
-      const res: boolean = await this.d.open(this.install).afterClosed().toPromise();
-      console.log(res);
-      const promptRes = await e.prompt();
-      console.log(promptRes);
-    });
+    window.addEventListener('beforeinstallprompt', (e: any) => e.prompt());
   }
 }
