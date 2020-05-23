@@ -9,13 +9,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="152.60007"
+   width="152.14001"
    height="152.14001"
-   viewBox="0 0 40.375434 40.253712"
+   viewBox="0 0 40.253712 40.253712"
    version="1.1"
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
-   sodipodi:docname="icon.svg">
+   sodipodi:docname="icon.svg"
+   inkscape:export-filename="D:\Documenti\Esperimenti\pennywize\docs\icons\icon-152x152.png"
+   inkscape:export-xdpi="95.911652"
+   inkscape:export-ydpi="95.911652">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -26,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="83.194062"
+     inkscape:cx="36.0957"
      inkscape:cy="56.785475"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -92,7 +95,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -117,7 +120,7 @@
        ry="6.5673332"
        inkscape:label="Cerchio" />
     <path
-       style="display:inline;stroke-width:0.99999994;fill:#fffcdc;fill-opacity:1"
+       style="display:inline;fill:#fffcdc;fill-opacity:1;stroke-width:0.99999994"
        d="m 230.68945,628.9043 a 24.821428,24.821417 0 0 1 1.66016,3.08593 h 12.76172 l -11.19336,16.1875 a 24.821428,24.821417 0 0 1 -4.35938,9.16407 h 20.66993 v -3.06641 h -16.26954 l 15.64454,-22.61719 v -2.7539 z"
        transform="scale(0.26458333)"
        id="path867"
@@ -137,7 +140,7 @@
        inkscape:connector-curvature="0"
        inkscape:label="W verde" />
     <path
-       style="display:inline;stroke-width:0.99999994;fill:#fffcdc;fill-opacity:1"
+       style="display:inline;fill:#fffcdc;fill-opacity:1;stroke-width:0.99999994"
        d="m 170.44336,628.9043 v 28.4375 h 3.75 v -11.13282 h 6.69922 c 1.64942,0 3.09989,-0.19746 4.35547,-0.58789 A 24.821428,24.821417 0 0 1 185,642.3418 a 24.821428,24.821417 0 0 1 0.01,-0.21094 c -1.02535,0.67069 -2.38209,1.01172 -4.07813,1.01172 h -6.73828 v -11.15235 h 6.95312 c 1.86198,0.0391 3.32683,0.5664 4.39454,1.58204 0.2939,0.27956 0.54285,0.5871 0.75586,0.91796 a 24.821428,24.821417 0 0 1 1.5039,-3.55468 c -1.71765,-1.3483 -4.00212,-2.03125 -6.86914,-2.03125 z"
        transform="scale(0.26458333)"
        id="path863"
