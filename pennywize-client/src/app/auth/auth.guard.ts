@@ -13,7 +13,7 @@ export class AuthGuard implements CanActivate {
       .justLogged(({ stop }) => stop())
       .go();
 
-    if (!success) this.r.navigateByUrl('/home');
+    if (!success) this.r.navigateByUrl('/');
 
     return success;
   }

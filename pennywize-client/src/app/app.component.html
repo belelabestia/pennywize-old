@@ -1,1 +1,11 @@
 <router-outlet></router-outlet>
+
+<ng-template #install>
+    <div mat-dialog-content>
+        <p>Vuoi installare Pennywize?</p>
+    </div>
+    <div mat-dialog-actions>
+        <button mat-mat-raised-button [mat-dialog-close]="true" cdkFocusInitial>Sì</button>
+        <button mat-button [mat-dialog-close]="false">No</button>
+    </div>
+</ng-template>
